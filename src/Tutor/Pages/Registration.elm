@@ -1,4 +1,4 @@
-module Tutor.Pages.Registration exposing (Model, Msg(..), init, main, subscriptions, update, view)
+module Main exposing (main)
 
 import Browser
 import Html exposing (..)
@@ -10,7 +10,7 @@ import Tutor.Pages.Registration.Widget as Widget
 
 
 main =
-    Browser.element
+    Browser.document
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -22,11 +22,7 @@ type alias Model =
     {}
 
 
-type alias Flags =
-    {}
-
-
-init : Flags -> ( Model, Cmd Msg )
+init : () -> ( Model, Cmd Msg )
 init _ =
     ( {}, Cmd.none )
 
@@ -45,6 +41,14 @@ subscriptions model =
     Sub.none
 
 
-view : Model -> Html Msg
+type alias Document msg =
+    { title : String
+    , body : List (Html msg)
+    }
+
+
+view : Model -> Browser.Document Msg
 view model =
-    h1 [] [ text "Înregistrare repetitor!", Widget.view ]
+    { title = "Înregistrare repetitor"
+    , body = [ h1 [] [ text "Înregistrare repetitor!", Widget.view ] ]
+    }
