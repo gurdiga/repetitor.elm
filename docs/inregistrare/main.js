@@ -4819,16 +4819,25 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var elm$html$Html$h1 = _VirtualDom_node('h1');
+var elm$html$Html$pre = _VirtualDom_node('pre');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var author$project$Tutor$Pages$Registration$Widget$view = A2(
+	elm$html$Html$pre,
+	_List_Nil,
+	_List_fromArray(
+		[
+			elm$html$Html$text('I am a Widget')
+		]));
+var elm$html$Html$h1 = _VirtualDom_node('h1');
 var author$project$Tutor$Pages$Registration$view = function (model) {
 	return A2(
 		elm$html$Html$h1,
 		_List_Nil,
 		_List_fromArray(
 			[
-				elm$html$Html$text('Înregistrare repetitor')
+				elm$html$Html$text('Înregistrare repetitor!'),
+				author$project$Tutor$Pages$Registration$Widget$view
 			]));
 };
 var elm$browser$Browser$External = function (a) {
