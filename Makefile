@@ -20,3 +20,8 @@ open:
 
 start:
 	elm reactor --port $(SERVER_PORT)
+
+
+deploy:	build
+	git commit -am 'Deploy'
+	git push
