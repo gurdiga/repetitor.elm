@@ -1,9 +1,12 @@
 build: elm.json tutor-pages
 
-tutor-pages: inregistrare-tutor
+tutor-pages: inregistrare autentificare
 
-inregistrare-tutor:
+inregistrare:
 	elm make --optimize src/Tutor/Pages/Registration.elm --output=docs/$@/main.js
+
+autentificare:
+	elm make --optimize src/Tutor/Pages/Authentication.elm --output=docs/$@/main.js
 
 elm.json:
 	elm init

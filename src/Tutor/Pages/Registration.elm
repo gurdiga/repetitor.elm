@@ -6,7 +6,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode exposing (Decoder, field, string)
-import Tutor.Pages.Registration.Widget as Widget
 
 
 main =
@@ -50,5 +49,13 @@ type alias Document msg =
 view : Model -> Browser.Document Msg
 view model =
     { title = "Înregistrare repetitor"
-    , body = [ h1 [] [ text "Înregistrare repetitor!", Widget.view ] ]
+    , body = [ pageContents model ]
     }
+
+
+pageContents : Model -> Html Msg
+pageContents model =
+    div []
+        [ h1 [] [ text "Înregistrare repetitor" ]
+        , p [] [ text "TODO: Create form" ]
+        ]

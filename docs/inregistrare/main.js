@@ -4819,29 +4819,38 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var elm$html$Html$pre = _VirtualDom_node('pre');
+var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$h1 = _VirtualDom_node('h1');
+var elm$html$Html$p = _VirtualDom_node('p');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Tutor$Pages$Registration$Widget$view = A2(
-	elm$html$Html$pre,
-	_List_Nil,
-	_List_fromArray(
-		[
-			elm$html$Html$text('I am a Widget')
-		]));
-var elm$html$Html$h1 = _VirtualDom_node('h1');
-var author$project$Main$view = function (model) {
-	return {
-		U: _List_fromArray(
+var author$project$Main$pageContents = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
 			[
 				A2(
 				elm$html$Html$h1,
 				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text('Înregistrare repetitor!'),
-						author$project$Tutor$Pages$Registration$Widget$view
+						elm$html$Html$text('Înregistrare repetitor')
+					])),
+				A2(
+				elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('TODO: Create form')
 					]))
+			]));
+};
+var author$project$Main$view = function (model) {
+	return {
+		U: _List_fromArray(
+			[
+				author$project$Main$pageContents(model)
 			]),
 		as: 'Înregistrare repetitor'
 	};
@@ -5139,5 +5148,4 @@ var elm$browser$Browser$document = _Browser_document;
 var author$project$Main$main = elm$browser$Browser$document(
 	{aC: author$project$Main$init, aL: author$project$Main$subscriptions, aM: author$project$Main$update, aO: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(
-		{}))(0)}});}(this));
+	elm$json$Json$Decode$succeed(0))(0)}});}(this));
