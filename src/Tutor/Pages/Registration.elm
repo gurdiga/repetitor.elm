@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Tutor.Pages.Registration exposing (main)
 
 import Browser
 import Html exposing (..)
@@ -6,6 +6,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode exposing (Decoder, field, string)
+
+
+
+-- path name: inregistrare
 
 
 main =

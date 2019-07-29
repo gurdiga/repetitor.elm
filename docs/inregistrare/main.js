@@ -4787,17 +4787,17 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var author$project$Main$init = function (_n0) {
+var author$project$Tutor$Pages$Registration$init = function (_n0) {
 	return _Utils_Tuple2(
 		{},
 		elm$core$Platform$Cmd$none);
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
 var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Main$subscriptions = function (model) {
+var author$project$Tutor$Pages$Registration$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
-var author$project$Main$update = F2(
+var author$project$Tutor$Pages$Registration$update = F2(
 	function (msg, model) {
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	});
@@ -4824,7 +4824,7 @@ var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$p = _VirtualDom_node('p');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Main$pageContents = function (model) {
+var author$project$Tutor$Pages$Registration$pageContents = function (model) {
 	return A2(
 		elm$html$Html$div,
 		_List_Nil,
@@ -4846,11 +4846,11 @@ var author$project$Main$pageContents = function (model) {
 					]))
 			]));
 };
-var author$project$Main$view = function (model) {
+var author$project$Tutor$Pages$Registration$view = function (model) {
 	return {
 		U: _List_fromArray(
 			[
-				author$project$Main$pageContents(model)
+				author$project$Tutor$Pages$Registration$pageContents(model)
 			]),
 		as: 'Înregistrare repetitor'
 	};
@@ -5145,7 +5145,7 @@ var elm$url$Url$fromString = function (str) {
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$document = _Browser_document;
-var author$project$Main$main = elm$browser$Browser$document(
-	{aC: author$project$Main$init, aL: author$project$Main$subscriptions, aM: author$project$Main$update, aO: author$project$Main$view});
-_Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(0))(0)}});}(this));
+var author$project$Tutor$Pages$Registration$main = elm$browser$Browser$document(
+	{aC: author$project$Tutor$Pages$Registration$init, aL: author$project$Tutor$Pages$Registration$subscriptions, aM: author$project$Tutor$Pages$Registration$update, aO: author$project$Tutor$Pages$Registration$view});
+_Platform_export({'Tutor':{'Pages':{'Registration':{'init':author$project$Tutor$Pages$Registration$main(
+	elm$json$Json$Decode$succeed(0))(0)}}}});}(this));
