@@ -30,7 +30,7 @@ start:
 
 
 deploy:	build
-	git commit -am 'Deploy'
+	git commit --allow-empty -am 'Deploy'
 	git push
 
 e: edit
