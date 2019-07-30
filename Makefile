@@ -21,7 +21,7 @@ deploy:	build
 
 e: edit
 edit:
-	code -n .
+	mine .
 
 build: elm.json tutor-pages
 

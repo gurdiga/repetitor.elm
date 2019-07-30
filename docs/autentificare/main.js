@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.F === region.X.F)
+	if (region.ba.aB === region.bs.aB)
 	{
-		return 'on line ' + region.R.F;
+		return 'on line ' + region.ba.aB;
 	}
-	return 'on lines ' + region.R.F + ' through ' + region.X.F;
+	return 'on lines ' + region.ba.aB + ' through ' + region.bs.aB;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aC,
-		impl.aM,
-		impl.aL,
+		impl.cc,
+		impl.cr,
+		impl.cq,
 		function() { return function() {} }
 	);
 });
@@ -2659,9 +2659,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
-		S: record.S,
-		P: record.P
+		H: func(record.H),
+		bb: record.bb,
+		a8: record.a8
 	}
 });
 
@@ -2929,11 +2929,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var message = !tag ? value : tag < 3 ? value.a : value.H;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.bb;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.a8) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3883,11 +3883,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aC,
-		impl.aM,
-		impl.aL,
+		impl.cc,
+		impl.cr,
+		impl.cq,
 		function(sendToApp, initialModel) {
-			var view = impl.aO;
+			var view = impl.cu;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3919,12 +3919,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aC,
-		impl.aM,
-		impl.aL,
+		impl.cc,
+		impl.cr,
+		impl.cq,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.G && impl.G(sendToApp)
-			var view = impl.aO;
+			var divertHrefToApp = impl.aF && impl.aF(sendToApp)
+			var view = impl.cu;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3932,12 +3932,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.U);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bl);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.as) && (_VirtualDom_doc.title = title = doc.as);
+				(title !== doc.bX) && (_VirtualDom_doc.title = title = doc.bX);
 			});
 		}
 	);
@@ -3993,12 +3993,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aE;
-	var onUrlRequest = impl.aF;
+	var onUrlChange = impl.cg;
+	var onUrlRequest = impl.ch;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		G: function(sendToApp)
+		aF: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4014,9 +4014,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ai === next.ai
-							&& curr._ === next._
-							&& curr.af.a === next.af.a
+							&& curr.bK === next.bK
+							&& curr.bw === next.bw
+							&& curr.bH.a === next.bH.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4024,13 +4024,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aC: function(flags)
+		cc: function(flags)
 		{
-			return A3(impl.aC, flags, _Browser_getUrl(), key);
+			return A3(impl.cc, flags, _Browser_getUrl(), key);
 		},
-		aO: impl.aO,
-		aM: impl.aM,
-		aL: impl.aL
+		cu: impl.cu,
+		cr: impl.cr,
+		cq: impl.cq
 	});
 }
 
@@ -4096,17 +4096,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aA: 'hidden', aw: 'visibilitychange' }
+		? { b9: 'hidden', b3: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aA: 'mozHidden', aw: 'mozvisibilitychange' }
+		? { b9: 'mozHidden', b3: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aA: 'msHidden', aw: 'msvisibilitychange' }
+		? { b9: 'msHidden', b3: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aA: 'webkitHidden', aw: 'webkitvisibilitychange' }
-		: { aA: 'hidden', aw: 'visibilitychange' };
+		? { b9: 'webkitHidden', b3: 'webkitvisibilitychange' }
+		: { b9: 'hidden', b3: 'visibilitychange' };
 }
 
 
@@ -4187,12 +4187,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ao: _Browser_getScene(),
-		at: {
-			L: _Browser_window.pageXOffset,
-			M: _Browser_window.pageYOffset,
-			D: _Browser_doc.documentElement.clientWidth,
-			y: _Browser_doc.documentElement.clientHeight
+		bR: _Browser_getScene(),
+		b_: {
+			a_: _Browser_window.pageXOffset,
+			a$: _Browser_window.pageYOffset,
+			at: _Browser_doc.documentElement.clientWidth,
+			af: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4202,8 +4202,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		D: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		af: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4226,15 +4226,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ao: {
-				D: node.scrollWidth,
-				y: node.scrollHeight
+			bR: {
+				at: node.scrollWidth,
+				af: node.scrollHeight
 			},
-			at: {
-				L: node.scrollLeft,
-				M: node.scrollTop,
-				D: node.clientWidth,
-				y: node.clientHeight
+			b_: {
+				a_: node.scrollLeft,
+				a$: node.scrollTop,
+				at: node.clientWidth,
+				af: node.clientHeight
 			}
 		};
 	});
@@ -4264,18 +4264,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ao: _Browser_getScene(),
-			at: {
-				L: x,
-				M: y,
-				D: _Browser_doc.documentElement.clientWidth,
-				y: _Browser_doc.documentElement.clientHeight
+			bR: _Browser_getScene(),
+			b_: {
+				a_: x,
+				a$: y,
+				at: _Browser_doc.documentElement.clientWidth,
+				af: _Browser_doc.documentElement.clientHeight
 			},
-			ax: {
-				L: x + rect.left,
-				M: y + rect.top,
-				D: rect.width,
-				y: rect.height
+			b6: {
+				a_: x + rect.left,
+				a$: y + rect.top,
+				at: rect.width,
+				af: rect.height
 			}
 		};
 	});
@@ -4507,25 +4507,25 @@ var elm$core$Basics$sub = _Basics_sub;
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.a) {
+		if (!builder.g) {
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.c),
+				elm$core$Elm$JsArray$length(builder.i),
 				elm$core$Array$shiftStep,
 				elm$core$Elm$JsArray$empty,
-				builder.c);
+				builder.i);
 		} else {
-			var treeLen = builder.a * elm$core$Array$branchFactor;
+			var treeLen = builder.g * elm$core$Array$branchFactor;
 			var depth = elm$core$Basics$floor(
 				A2(elm$core$Basics$logBase, elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.d) : builder.d;
-			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
+			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.j) : builder.j;
+			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.g);
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.c) + treeLen,
+				elm$core$Elm$JsArray$length(builder.i) + treeLen,
 				A2(elm$core$Basics$max, 5, depth * elm$core$Array$shiftStep),
 				tree,
-				builder.c);
+				builder.i);
 		}
 	});
 var elm$core$Basics$idiv = _Basics_idiv;
@@ -4539,7 +4539,7 @@ var elm$core$Array$initializeHelp = F5(
 				return A2(
 					elm$core$Array$builderToArray,
 					false,
-					{d: nodeList, a: (len / elm$core$Array$branchFactor) | 0, c: tail});
+					{j: nodeList, g: (len / elm$core$Array$branchFactor) | 0, i: tail});
 			} else {
 				var leaf = elm$core$Array$Leaf(
 					A3(elm$core$Elm$JsArray$initialize, elm$core$Array$branchFactor, fromIndex, fn));
@@ -4848,11 +4848,11 @@ var author$project$Tutor$Pages$Authentication$pageContents = function (model) {
 };
 var author$project$Tutor$Pages$Authentication$view = function (model) {
 	return {
-		U: _List_fromArray(
+		bl: _List_fromArray(
 			[
 				author$project$Tutor$Pages$Authentication$pageContents(model)
 			]),
-		as: 'Autentificare repetitor'
+		bX: 'Autentificare repetitor'
 	};
 };
 var elm$browser$Browser$External = function (a) {
@@ -5040,7 +5040,7 @@ var elm$core$String$contains = _String_contains;
 var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {Z: fragment, _: host, ad: path, af: port_, ai: protocol, aj: query};
+		return {bv: fragment, bw: host, bF: path, bH: port_, bK: protocol, bL: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
@@ -5146,6 +5146,6 @@ var elm$url$Url$fromString = function (str) {
 };
 var elm$browser$Browser$document = _Browser_document;
 var author$project$Tutor$Pages$Authentication$main = elm$browser$Browser$document(
-	{aC: author$project$Tutor$Pages$Authentication$init, aL: author$project$Tutor$Pages$Authentication$subscriptions, aM: author$project$Tutor$Pages$Authentication$update, aO: author$project$Tutor$Pages$Authentication$view});
+	{cc: author$project$Tutor$Pages$Authentication$init, cq: author$project$Tutor$Pages$Authentication$subscriptions, cr: author$project$Tutor$Pages$Authentication$update, cu: author$project$Tutor$Pages$Authentication$view});
 _Platform_export({'Tutor':{'Pages':{'Authentication':{'init':author$project$Tutor$Pages$Authentication$main(
 	elm$json$Json$Decode$succeed(0))(0)}}}});}(this));
