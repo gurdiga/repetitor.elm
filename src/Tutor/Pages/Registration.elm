@@ -19,35 +19,145 @@ main =
         }
 
 
+
+-- MODEL
+
+
 type alias Model =
     { form : RegistrationForm }
 
 
 type RegistrationForm
-    = EmptyRegistrationForm
-    | ValidRegistrationForm
-    | InvalidRegistrationForm
+    = IncompleteRegistrationForm IncompleteRegistrationFormFields
+    | CompleteRegistrationForm CompleteRegistrationFormFields
+
+
+type alias IncompleteRegistrationFormFields =
+    { firstName : FieldValue FirstName
+    , lastName : FieldValue String -- TODO: Replace String with LastName
+    , birthYear : FieldValue Int -- TODO: Replace Int with BirthYear
+    , phoneNumber : FieldValue String -- TODO: Replace String with PhoneNumber
+    , email : FieldValue String -- TODO: Replace String with Email
+    }
+
+
+type alias CompleteRegistrationFormFields =
+    { firstName : FirstName
+    , lastName : String -- TODO: Replace String with LastName
+    , birthYear : Int -- TODO: Replace Int with BirthYear
+    , phoneNumber : String -- TODO: Replace String with PhoneNumber
+    , email : String -- TODO: Replace String with Email
+    }
+
+
+type FirstName
+    = FirstName String
+
+
+makeFirstName : String -> Result String FirstName
+makeFirstName string =
+    if String.length string > 1 then
+        Ok (FirstName string)
+
+    else
+        Err "First name has to have 2 ore more characters"
+
+
+type alias ErrorMessage =
+    String
+
+
+type alias TextValue =
+    String
+
+
+type FieldValue a
+    = ValidFieldValue TextValue a
+    | InvalidFieldValue TextValue ErrorMessage
+    | EmptyValue
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { form = EmptyRegistrationForm }
+    ( { form = emptyForm }
     , Cmd.none
     )
 
 
+emptyForm : RegistrationForm
+emptyForm =
+    IncompleteRegistrationForm
+        { firstName = EmptyValue
+        , lastName = EmptyValue
+        , birthYear = EmptyValue
+        , phoneNumber = EmptyValue
+        , email = EmptyValue
+        }
+
+
+
+-- UPDATE
+
+
 type Msg
-    = UpdateFormField String String
+    = UpdateFirstName String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    let
+        newModel =
+            case msg of
+                UpdateFirstName string ->
+                    case model.form of
+                        IncompleteRegistrationForm fields ->
+                            let
+                                newFields =
+                                    { fields
+                                        | firstName =
+                                            case makeFirstName string of
+                                                Ok firstName ->
+                                                    ValidFieldValue string firstName
+
+                                                Err errorMessage ->
+                                                    InvalidFieldValue string errorMessage
+                                    }
+                            in
+                            { model | form = validateForm newFields }
+
+                        CompleteRegistrationForm fields ->
+                            model
+    in
+    ( newModel, Cmd.none )
+
+
+validateForm : IncompleteRegistrationFormFields -> RegistrationForm
+validateForm ({ firstName, lastName, birthYear, phoneNumber, email } as fields) =
+    case ( firstName, lastName, ( birthYear, phoneNumber, email ) ) of
+        ( ValidFieldValue _ validFirstName, ValidFieldValue _ validLastName, ( ValidFieldValue _ validBirthYear, ValidFieldValue _ validPhoneNumber, ValidFieldValue _ validEmail ) ) ->
+            CompleteRegistrationForm
+                { firstName = validFirstName
+                , lastName = validLastName
+                , birthYear = validBirthYear
+                , phoneNumber = validPhoneNumber
+                , email = validEmail
+                }
+
+        _ ->
+            IncompleteRegistrationForm fields
+
+
+
+-- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+
+-- VIEW
 
 
 view : Model -> Browser.Document Msg
@@ -94,20 +204,6 @@ registrationForm =
         , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
         , submitButton { label = "Înregistrează" }
         ]
-
-
-type alias ErrorMessage =
-    String
-
-
-type alias TextValue =
-    String
-
-
-type FieldValue a
-    = ValidFieldValue TextValue a
-    | InvalidFieldValue TextValue ErrorMessage
-    | EmptyValue
 
 
 textField : { label : String, placeHolder : String, fieldValue : FieldValue a } -> Html Msg
