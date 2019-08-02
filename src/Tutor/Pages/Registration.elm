@@ -50,6 +50,20 @@ type alias CompleteRegistrationFormFields =
     }
 
 
+type alias ErrorMessage =
+    String
+
+
+type alias TextValue =
+    String
+
+
+type FieldValue a
+    = ValidFieldValue TextValue a
+    | InvalidFieldValue TextValue ErrorMessage
+    | EmptyValue
+
+
 type FirstName
     = FirstName String
 
@@ -63,18 +77,9 @@ makeFirstName string =
         Err "First name has to have 2 ore more characters"
 
 
-type alias ErrorMessage =
-    String
-
-
-type alias TextValue =
-    String
-
-
-type FieldValue a
-    = ValidFieldValue TextValue a
-    | InvalidFieldValue TextValue ErrorMessage
-    | EmptyValue
+firstNameToString : FirstName -> String
+firstNameToString (FirstName string) =
+    string
 
 
 init : () -> ( Model, Cmd Msg )
@@ -105,34 +110,38 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    case msg of
+        UpdateFirstName string ->
+            ( { model | form = updateFirstName model.form string }, Cmd.none )
+
+
+updateFirstName : RegistrationForm -> String -> RegistrationForm
+updateFirstName form string =
     let
-        newModel =
-            case msg of
-                UpdateFirstName string ->
-                    case model.form of
-                        IncompleteRegistrationForm fields ->
-                            let
-                                newFields =
-                                    { fields
-                                        | firstName =
-                                            case makeFirstName string of
-                                                Ok firstName ->
-                                                    ValidFieldValue string firstName
+        incompleteFormFields =
+            case form of
+                IncompleteRegistrationForm fields ->
+                    fields
 
-                                                Err errorMessage ->
-                                                    InvalidFieldValue string errorMessage
-                                    }
-                            in
-                            { model | form = validateForm newFields }
+                CompleteRegistrationForm fields ->
+                    makeIncompleteRegistrationFormFields fields
 
-                        CompleteRegistrationForm fields ->
-                            model
+        newIncompleteRegistrationFormFields =
+            { incompleteFormFields
+                | firstName =
+                    case makeFirstName string of
+                        Ok firstName ->
+                            ValidFieldValue string firstName
+
+                        Err errorMessage ->
+                            InvalidFieldValue string errorMessage
+            }
     in
-    ( newModel, Cmd.none )
+    makeRegistrationForm newIncompleteRegistrationFormFields
 
 
-validateForm : IncompleteRegistrationFormFields -> RegistrationForm
-validateForm ({ firstName, lastName, birthYear, phoneNumber, email } as fields) =
+makeRegistrationForm : IncompleteRegistrationFormFields -> RegistrationForm
+makeRegistrationForm ({ firstName, lastName, birthYear, phoneNumber, email } as fields) =
     case ( firstName, lastName, ( birthYear, phoneNumber, email ) ) of
         ( ValidFieldValue _ validFirstName, ValidFieldValue _ validLastName, ( ValidFieldValue _ validBirthYear, ValidFieldValue _ validPhoneNumber, ValidFieldValue _ validEmail ) ) ->
             CompleteRegistrationForm
@@ -145,6 +154,16 @@ validateForm ({ firstName, lastName, birthYear, phoneNumber, email } as fields) 
 
         _ ->
             IncompleteRegistrationForm fields
+
+
+makeIncompleteRegistrationFormFields : CompleteRegistrationFormFields -> IncompleteRegistrationFormFields
+makeIncompleteRegistrationFormFields { firstName, lastName, birthYear, phoneNumber, email } =
+    { firstName = ValidFieldValue (firstNameToString firstName) firstName
+    , lastName = ValidFieldValue lastName lastName
+    , birthYear = ValidFieldValue (String.fromInt birthYear) birthYear
+    , phoneNumber = ValidFieldValue phoneNumber phoneNumber
+    , email = ValidFieldValue email email
+    }
 
 
 
