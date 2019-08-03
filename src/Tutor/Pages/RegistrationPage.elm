@@ -1,13 +1,11 @@
 module Tutor.Pages.RegistrationPage exposing (main)
 
 import Browser
-import Domain.Utils.FieldValue exposing (FieldValue(..), fieldValueFromString)
-import Domain.Utils.FirstName exposing (makeFirstName)
-import Domain.Utils.LastName exposing (makeLastName)
-import Domain.Utils.YearOfBirth exposing (YearOfBirth, makeYearOfBirth)
-import Html exposing (Attribute, Html, button, div, h1, input, span, text)
+import Domain.Utils.FieldValue exposing (FieldValue(..))
+import Html exposing (Attribute, Html, button, div, h1, input, pre, span, text)
 import Html.Attributes exposing (placeholder, style, type_, value)
-import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, updateFirstName, updateForm, updateLastName)
+import Html.Events exposing (onInput)
+import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updateLastName, updatePhoneNumber)
 
 
 
@@ -18,7 +16,7 @@ main =
     Browser.document
         { init = init
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = \_ -> Sub.none
         , view = view
         }
 
@@ -45,6 +43,9 @@ init _ =
 type Msg
     = UpdateFirstName String
     | UpdateLastName String
+    | UpdateBirthYear String
+    | UpdatePhoneNumber String
+    | UpdateEmail String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -56,14 +57,14 @@ update msg model =
         UpdateLastName string ->
             ( { model | form = updateLastName model.form string }, Cmd.none )
 
+        UpdateBirthYear string ->
+            ( { model | form = updateBirthYear model.form string }, Cmd.none )
 
+        UpdatePhoneNumber string ->
+            ( { model | form = updatePhoneNumber model.form string }, Cmd.none )
 
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+        UpdateEmail string ->
+            ( { model | form = updateEmail model.form string }, Cmd.none )
 
 
 
@@ -81,7 +82,8 @@ pageContents : Model -> Html Msg
 pageContents model =
     layoutPageContainer []
         [ h1 [] [ text "Înregistrare repetitor" ]
-        , registrationForm
+        , registrationForm model.form
+        , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
         ]
 
 
@@ -99,33 +101,26 @@ layoutPageContainer additionalAttrs children =
     div attrs children
 
 
-registrationForm : Html Msg
-registrationForm =
+registrationForm : RegistrationForm -> Html Msg
+registrationForm form =
     let
         styles =
             [ style "max-width" "400px" ]
     in
     Html.form styles
-        [ textField { label = "Prenume", placeHolder = "de exemplu George", fieldValue = fieldValueFromString makeFirstName "Ion" }
-        , textField { label = "Nume de familie", placeHolder = "de exemplu Teodorescu", fieldValue = fieldValueFromString makeLastName "Teodorescu" }
-        , textField { label = "Anul nașterii", placeHolder = "de " ++ Debug.toString (makeYearOfBirth "1989"), fieldValue = EmptyFieldValue }
-        , textField { label = "Număr de telefon", placeHolder = "de exemplu 123456789", fieldValue = EmptyFieldValue }
-        , textField { label = "Email", placeHolder = "de exemplu george@gmail.com", fieldValue = EmptyFieldValue }
+        [ textField { label = "Prenume", placeHolder = "de exemplu George", fieldValue = getFieldValue form .firstName, toMsg = UpdateFirstName }
+        , textField { label = "Nume de familie", placeHolder = "de exemplu Teodorescu", fieldValue = getFieldValue form .lastName, toMsg = UpdateLastName }
+        , textField { label = "Anul nașterii", placeHolder = "de exemplu 1979", fieldValue = getFieldValue form .birthYear, toMsg = UpdateBirthYear }
+        , textField { label = "Număr de telefon", placeHolder = "de exemplu 123456789", fieldValue = getFieldValue form .phoneNumber, toMsg = UpdatePhoneNumber }
+        , textField { label = "Email", placeHolder = "de exemplu george@gmail.com", fieldValue = getFieldValue form .email, toMsg = UpdateEmail }
         , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
         , submitButton { label = "Înregistrează" }
         ]
 
 
-textField : { label : String, placeHolder : String, fieldValue : FieldValue a } -> Html Msg
-textField { label, placeHolder, fieldValue } =
+textField : { label : String, placeHolder : String, fieldValue : FieldValue a, toMsg : String -> Msg } -> Html Msg
+textField { label, placeHolder, fieldValue, toMsg } =
     let
-        inputStyles =
-            [ style "font" "inherit"
-            ]
-
-        inputAttrs =
-            inputStyles ++ [ placeholder placeHolder, value inputValue ]
-
         ( inputValue, fieldInfo, fieldInfoColor ) =
             case fieldValue of
                 EmptyFieldValue ->
@@ -137,6 +132,10 @@ textField { label, placeHolder, fieldValue } =
                 ValidFieldValue textValue _ ->
                     ( textValue, "Bun.", "green" )
 
+        inputStyles =
+            [ style "font" "inherit"
+            ]
+
         fieldInfoStyle =
             [ style "grid-column-start" "field"
             , style "color" fieldInfoColor
@@ -145,7 +144,7 @@ textField { label, placeHolder, fieldValue } =
     layoutRow
         [ Html.label labelStyles
             [ span labelTextStyles [ text label ]
-            , input inputAttrs []
+            , input (inputStyles ++ [ placeholder placeHolder, value inputValue, onInput toMsg ]) []
             , span fieldInfoStyle [ text fieldInfo ]
             ]
         ]
@@ -205,11 +204,3 @@ layoutRow children =
             styles
     in
     div attrs children
-
-
-type MoldovaPhoneNumber
-    = MoldovaPhoneNumber String
-
-
-type Email
-    = Email String

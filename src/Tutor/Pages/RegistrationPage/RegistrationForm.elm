@@ -1,30 +1,33 @@
-module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldValues, RegistrationForm, Values, emptyForm, updateFirstName, updateForm, updateLastName)
+module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldValueSet, RegistrationForm, ValueSet, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updateLastName, updatePhoneNumber)
 
+import Domain.Utils.BirthYear exposing (BirthYear, birthYearToString, makeBirthYear)
+import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
 import Domain.Utils.FieldValue exposing (FieldValue(..), fieldValueFromString, makeValidFieldValue)
 import Domain.Utils.FirstName exposing (FirstName, firstNameToString, makeFirstName)
 import Domain.Utils.LastName exposing (LastName, lastNameToString, makeLastName)
+import Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
 
 
 type RegistrationForm
-    = IncompleteRegistrationForm FieldValues
-    | CompleteRegistrationForm Values
+    = IncompleteRegistrationForm FieldValueSet
+    | CompleteRegistrationForm ValueSet
 
 
-type alias FieldValues =
+type alias FieldValueSet =
     { firstName : FieldValue FirstName
     , lastName : FieldValue LastName
-    , birthYear : FieldValue Int -- TODO: Replace Int with BirthYear
-    , phoneNumber : FieldValue String -- TODO: Replace String with PhoneNumber
-    , email : FieldValue String -- TODO: Replace String with Email
+    , birthYear : FieldValue BirthYear
+    , phoneNumber : FieldValue PhoneNumber
+    , email : FieldValue Email
     }
 
 
-type alias Values =
+type alias ValueSet =
     { firstName : FirstName
     , lastName : LastName
-    , birthYear : Int -- TODO: Replace Int with BirthYear
-    , phoneNumber : String -- TODO: Replace String with PhoneNumber
-    , email : String -- TODO: Replace String with Email
+    , birthYear : BirthYear
+    , phoneNumber : PhoneNumber
+    , email : Email
     }
 
 
@@ -39,7 +42,37 @@ emptyForm =
         }
 
 
-incompleteFormFields : RegistrationForm -> FieldValues
+updateFirstName : RegistrationForm -> String -> RegistrationForm
+updateFirstName form string =
+    updateForm form (\fieldValues -> { fieldValues | firstName = fieldValueFromString makeFirstName string })
+
+
+updateLastName : RegistrationForm -> String -> RegistrationForm
+updateLastName form string =
+    updateForm form (\fieldValues -> { fieldValues | lastName = fieldValueFromString makeLastName string })
+
+
+updateBirthYear : RegistrationForm -> String -> RegistrationForm
+updateBirthYear form string =
+    updateForm form (\fieldValues -> { fieldValues | birthYear = fieldValueFromString makeBirthYear string })
+
+
+updatePhoneNumber : RegistrationForm -> String -> RegistrationForm
+updatePhoneNumber form string =
+    updateForm form (\fieldValues -> { fieldValues | phoneNumber = fieldValueFromString makePhoneNumber string })
+
+
+updateEmail : RegistrationForm -> String -> RegistrationForm
+updateEmail form string =
+    updateForm form (\fieldValues -> { fieldValues | email = fieldValueFromString makeEmail string })
+
+
+getFieldValue : RegistrationForm -> (FieldValueSet -> FieldValue a) -> FieldValue a
+getFieldValue form accessFunction =
+    incompleteFormFields form |> accessFunction
+
+
+incompleteFormFields : RegistrationForm -> FieldValueSet
 incompleteFormFields form =
     case form of
         IncompleteRegistrationForm fields ->
@@ -48,13 +81,13 @@ incompleteFormFields form =
         CompleteRegistrationForm { firstName, lastName, birthYear, phoneNumber, email } ->
             { firstName = makeValidFieldValue firstName firstNameToString
             , lastName = makeValidFieldValue lastName lastNameToString
-            , birthYear = makeValidFieldValue birthYear String.fromInt
-            , phoneNumber = makeValidFieldValue phoneNumber (\s -> s)
-            , email = makeValidFieldValue email (\s -> s)
+            , birthYear = makeValidFieldValue birthYear birthYearToString
+            , phoneNumber = makeValidFieldValue phoneNumber phoneNumberToString
+            , email = makeValidFieldValue email emailToString
             }
 
 
-updateForm : RegistrationForm -> (FieldValues -> FieldValues) -> RegistrationForm
+updateForm : RegistrationForm -> (FieldValueSet -> FieldValueSet) -> RegistrationForm
 updateForm form updateFunction =
     let
         ({ firstName, lastName, birthYear, phoneNumber, email } as fieldValues) =
@@ -72,13 +105,3 @@ updateForm form updateFunction =
 
         _ ->
             IncompleteRegistrationForm fieldValues
-
-
-updateFirstName : RegistrationForm -> String -> RegistrationForm
-updateFirstName form string =
-    updateForm form (\fieldValues -> { fieldValues | firstName = fieldValueFromString makeFirstName string })
-
-
-updateLastName : RegistrationForm -> String -> RegistrationForm
-updateLastName form string =
-    updateForm form (\fieldValues -> { fieldValues | lastName = fieldValueFromString makeLastName string })
