@@ -1,4 +1,4 @@
-module Tutor.Pages.Authentication exposing (main)
+module Tutor.Pages.AuthenticationPage exposing (main)
 
 import Browser
 import Html exposing (..)
