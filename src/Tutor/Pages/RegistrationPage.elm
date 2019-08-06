@@ -84,16 +84,6 @@ pageContents model =
     layoutPageContainer []
         [ h1 [] [ text "Înregistrare repetitor" ]
         , registrationForm model.form
-        , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
-        , let
-            stringToParse =
-                "069829583"
-          in
-          pre [ style "white-space" "normal" ]
-            [ stringToParse |> Debug.toString |> text
-            , text " => "
-            , parsePhoneNumber stringToParse |> Debug.toString |> text
-            ]
         ]
 
 

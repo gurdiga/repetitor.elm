@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.R.F === region.X.F)
+	if (region._.O === region.ag.O)
 	{
-		return 'on line ' + region.R.F;
+		return 'on line ' + region._.O;
 	}
-	return 'on lines ' + region.R.F + ' through ' + region.X.F;
+	return 'on lines ' + region._.O + ' through ' + region.ag.O;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aC,
-		impl.aM,
-		impl.aL,
+		impl.a0,
+		impl.be,
+		impl.bc,
 		function() { return function() {} }
 	);
 });
@@ -2659,9 +2659,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
-		S: record.S,
-		P: record.P
+		v: func(record.v),
+		aa: record.aa,
+		Y: record.Y
 	}
 });
 
@@ -2929,11 +2929,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.S;
+		var message = !tag ? value : tag < 3 ? value.a : value.v;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aa;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.P) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.Y) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3883,11 +3883,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aC,
-		impl.aM,
-		impl.aL,
+		impl.a0,
+		impl.be,
+		impl.bc,
 		function(sendToApp, initialModel) {
-			var view = impl.aO;
+			var view = impl.bg;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3919,12 +3919,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aC,
-		impl.aM,
-		impl.aL,
+		impl.a0,
+		impl.be,
+		impl.bc,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.G && impl.G(sendToApp)
-			var view = impl.aO;
+			var divertHrefToApp = impl.P && impl.P(sendToApp)
+			var view = impl.bg;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3932,12 +3932,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.U);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aS);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.as) && (_VirtualDom_doc.title = title = doc.as);
+				(title !== doc.bd) && (_VirtualDom_doc.title = title = doc.bd);
 			});
 		}
 	);
@@ -3993,12 +3993,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aE;
-	var onUrlRequest = impl.aF;
+	var onUrlChange = impl.a4;
+	var onUrlRequest = impl.a5;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		G: function(sendToApp)
+		P: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4014,9 +4014,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ai === next.ai
-							&& curr._ === next._
-							&& curr.af.a === next.af.a
+							&& curr.az === next.az
+							&& curr.am === next.am
+							&& curr.av.a === next.av.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4024,13 +4024,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aC: function(flags)
+		a0: function(flags)
 		{
-			return A3(impl.aC, flags, _Browser_getUrl(), key);
+			return A3(impl.a0, flags, _Browser_getUrl(), key);
 		},
-		aO: impl.aO,
-		aM: impl.aM,
-		aL: impl.aL
+		bg: impl.bg,
+		be: impl.be,
+		bc: impl.bc
 	});
 }
 
@@ -4096,17 +4096,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aA: 'hidden', aw: 'visibilitychange' }
+		? { a_: 'hidden', aT: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aA: 'mozHidden', aw: 'mozvisibilitychange' }
+		? { a_: 'mozHidden', aT: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aA: 'msHidden', aw: 'msvisibilitychange' }
+		? { a_: 'msHidden', aT: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aA: 'webkitHidden', aw: 'webkitvisibilitychange' }
-		: { aA: 'hidden', aw: 'visibilitychange' };
+		? { a_: 'webkitHidden', aT: 'webkitvisibilitychange' }
+		: { a_: 'hidden', aT: 'visibilitychange' };
 }
 
 
@@ -4187,12 +4187,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		ao: _Browser_getScene(),
-		at: {
-			L: _Browser_window.pageXOffset,
-			M: _Browser_window.pageYOffset,
-			D: _Browser_doc.documentElement.clientWidth,
-			y: _Browser_doc.documentElement.clientHeight
+		aH: _Browser_getScene(),
+		aO: {
+			U: _Browser_window.pageXOffset,
+			V: _Browser_window.pageYOffset,
+			M: _Browser_doc.documentElement.clientWidth,
+			F: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4202,8 +4202,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		D: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		M: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		F: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4226,15 +4226,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			ao: {
-				D: node.scrollWidth,
-				y: node.scrollHeight
+			aH: {
+				M: node.scrollWidth,
+				F: node.scrollHeight
 			},
-			at: {
-				L: node.scrollLeft,
-				M: node.scrollTop,
-				D: node.clientWidth,
-				y: node.clientHeight
+			aO: {
+				U: node.scrollLeft,
+				V: node.scrollTop,
+				M: node.clientWidth,
+				F: node.clientHeight
 			}
 		};
 	});
@@ -4264,18 +4264,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			ao: _Browser_getScene(),
-			at: {
-				L: x,
-				M: y,
-				D: _Browser_doc.documentElement.clientWidth,
-				y: _Browser_doc.documentElement.clientHeight
+			aH: _Browser_getScene(),
+			aO: {
+				U: x,
+				V: y,
+				M: _Browser_doc.documentElement.clientWidth,
+				F: _Browser_doc.documentElement.clientHeight
 			},
-			ax: {
-				L: x + rect.left,
-				M: y + rect.top,
-				D: rect.width,
-				y: rect.height
+			aV: {
+				U: x + rect.left,
+				V: y + rect.top,
+				M: rect.width,
+				F: rect.height
 			}
 		};
 	});
@@ -4310,6 +4310,12 @@ function _Browser_load(url)
 		}
 	}));
 }
+var author$project$Domain$Utils$FieldValue$EmptyFieldValue = {$: 2};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$IncompleteRegistrationForm = function (a) {
+	return {$: 0, a: a};
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$emptyForm = author$project$Tutor$Pages$RegistrationPage$RegistrationForm$IncompleteRegistrationForm(
+	{aR: author$project$Domain$Utils$FieldValue$EmptyFieldValue, aW: author$project$Domain$Utils$FieldValue$EmptyFieldValue, aY: author$project$Domain$Utils$FieldValue$EmptyFieldValue, a2: author$project$Domain$Utils$FieldValue$EmptyFieldValue, a7: author$project$Domain$Utils$FieldValue$EmptyFieldValue});
 var elm$core$Basics$False = 1;
 var elm$core$Basics$True = 0;
 var elm$core$Result$isOk = function (result) {
@@ -4507,25 +4513,25 @@ var elm$core$Basics$sub = _Basics_sub;
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.a) {
+		if (!builder.e) {
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.c),
+				elm$core$Elm$JsArray$length(builder.g),
 				elm$core$Array$shiftStep,
 				elm$core$Elm$JsArray$empty,
-				builder.c);
+				builder.g);
 		} else {
-			var treeLen = builder.a * elm$core$Array$branchFactor;
+			var treeLen = builder.e * elm$core$Array$branchFactor;
 			var depth = elm$core$Basics$floor(
 				A2(elm$core$Basics$logBase, elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.d) : builder.d;
-			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
+			var correctNodeList = reverseNodeList ? elm$core$List$reverse(builder.h) : builder.h;
+			var tree = A2(elm$core$Array$treeFromBuilder, correctNodeList, builder.e);
 			return A4(
 				elm$core$Array$Array_elm_builtin,
-				elm$core$Elm$JsArray$length(builder.c) + treeLen,
+				elm$core$Elm$JsArray$length(builder.g) + treeLen,
 				A2(elm$core$Basics$max, 5, depth * elm$core$Array$shiftStep),
 				tree,
-				builder.c);
+				builder.g);
 		}
 	});
 var elm$core$Basics$idiv = _Basics_idiv;
@@ -4539,7 +4545,7 @@ var elm$core$Array$initializeHelp = F5(
 				return A2(
 					elm$core$Array$builderToArray,
 					false,
-					{d: nodeList, a: (len / elm$core$Array$branchFactor) | 0, c: tail});
+					{h: nodeList, e: (len / elm$core$Array$branchFactor) | 0, g: tail});
 			} else {
 				var leaf = elm$core$Array$Leaf(
 					A3(elm$core$Elm$JsArray$initialize, elm$core$Array$branchFactor, fromIndex, fn));
@@ -4787,23 +4793,299 @@ var elm$json$Json$Decode$errorToStringHelp = F2(
 	});
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
-var author$project$Tutor$Pages$Registration$init = function (_n0) {
+var author$project$Tutor$Pages$RegistrationPage$init = function (_n0) {
 	return _Utils_Tuple2(
-		{},
+		{i: author$project$Tutor$Pages$RegistrationPage$RegistrationForm$emptyForm},
 		elm$core$Platform$Cmd$none);
 };
-var elm$core$Platform$Sub$batch = _Platform_batch;
-var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Tutor$Pages$Registration$subscriptions = function (model) {
-	return elm$core$Platform$Sub$none;
+var author$project$Domain$Utils$BirthYear$BirthYear = elm$core$Basics$identity;
+var author$project$Domain$Utils$BirthYear$currentYear = 2019;
+var author$project$Domain$Utils$BirthYear$reasonToReject = function (_int) {
+	return (_int <= 0) ? elm$core$Maybe$Just('Incorrect number.') : ((_Utils_cmp(_int, author$project$Domain$Utils$BirthYear$currentYear - 7) > 0) ? elm$core$Maybe$Just('You are probably too young') : ((_Utils_cmp(_int, author$project$Domain$Utils$BirthYear$currentYear - 100) < 0) ? elm$core$Maybe$Just('You are probably too old') : elm$core$Maybe$Nothing));
 };
-var author$project$Tutor$Pages$Registration$update = F2(
-	function (msg, model) {
-		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-	});
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Result$fromMaybe = F2(
+	function (err, maybe) {
+		if (!maybe.$) {
+			var v = maybe.a;
+			return elm$core$Result$Ok(v);
+		} else {
+			return elm$core$Result$Err(err);
+		}
+	});
+var elm$core$String$toInt = _String_toInt;
+var elm$core$String$trim = _String_trim;
+var author$project$Domain$Utils$BirthYear$makeBirthYear = function (string) {
+	var trimedString = elm$core$String$trim(string);
+	var _int = A2(
+		elm$core$Result$fromMaybe,
+		'An de naștere invalid: ' + trimedString,
+		A2(
+			elm$core$Maybe$map,
+			elm$core$Basics$identity,
+			elm$core$String$toInt(trimedString)));
+	var saneInt = function () {
+		if (_int.$ === 1) {
+			var error = _int.a;
+			return elm$core$Result$Err(error);
+		} else {
+			var year = _int.a;
+			var _n1 = author$project$Domain$Utils$BirthYear$reasonToReject(year);
+			if (_n1.$ === 1) {
+				return elm$core$Result$Ok(year);
+			} else {
+				var reason = _n1.a;
+				return elm$core$Result$Err(reason);
+			}
+		}
+	}();
+	var result = saneInt;
+	return result;
+};
+var author$project$Domain$Utils$FieldValue$InvalidFieldValue = F2(
+	function (a, b) {
+		return {$: 1, a: a, b: b};
+	});
+var author$project$Domain$Utils$FieldValue$ValidFieldValue = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var author$project$Domain$Utils$FieldValue$fieldValueFromString = F2(
+	function (makeFunction, string) {
+		var _n0 = makeFunction(string);
+		if (!_n0.$) {
+			var value = _n0.a;
+			return A2(author$project$Domain$Utils$FieldValue$ValidFieldValue, string, value);
+		} else {
+			var errorMessage = _n0.a;
+			return A2(author$project$Domain$Utils$FieldValue$InvalidFieldValue, string, errorMessage);
+		}
+	});
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$CompleteRegistrationForm = function (a) {
+	return {$: 1, a: a};
+};
+var author$project$Domain$Utils$BirthYear$birthYearToString = function (_n0) {
+	var _int = _n0;
+	return elm$core$String$fromInt(_int);
+};
+var author$project$Domain$Utils$Email$emailToString = function (_n0) {
+	var string = _n0;
+	return string;
+};
+var author$project$Domain$Utils$FieldValue$makeValidFieldValue = F2(
+	function (value, toString) {
+		return A2(
+			author$project$Domain$Utils$FieldValue$ValidFieldValue,
+			toString(value),
+			value);
+	});
+var author$project$Domain$Utils$FirstName$firstNameToString = function (_n0) {
+	var string = _n0;
+	return string;
+};
+var author$project$Domain$Utils$LastName$lastNameToString = function (_n0) {
+	var string = _n0;
+	return string;
+};
+var author$project$Domain$Utils$PhoneNumber$phoneNumberToString = function (_n0) {
+	var string = _n0;
+	return string;
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$incompleteFormFields = function (form) {
+	if (!form.$) {
+		var fields = form.a;
+		return fields;
+	} else {
+		var firstName = form.a.aY;
+		var lastName = form.a.a2;
+		var birthYear = form.a.aR;
+		var phoneNumber = form.a.a7;
+		var email = form.a.aW;
+		return {
+			aR: A2(author$project$Domain$Utils$FieldValue$makeValidFieldValue, birthYear, author$project$Domain$Utils$BirthYear$birthYearToString),
+			aW: A2(author$project$Domain$Utils$FieldValue$makeValidFieldValue, email, author$project$Domain$Utils$Email$emailToString),
+			aY: A2(author$project$Domain$Utils$FieldValue$makeValidFieldValue, firstName, author$project$Domain$Utils$FirstName$firstNameToString),
+			a2: A2(author$project$Domain$Utils$FieldValue$makeValidFieldValue, lastName, author$project$Domain$Utils$LastName$lastNameToString),
+			a7: A2(author$project$Domain$Utils$FieldValue$makeValidFieldValue, phoneNumber, author$project$Domain$Utils$PhoneNumber$phoneNumberToString)
+		};
+	}
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateForm = F2(
+	function (form, updateFunction) {
+		var fieldValues = updateFunction(
+			author$project$Tutor$Pages$RegistrationPage$RegistrationForm$incompleteFormFields(form));
+		var firstName = fieldValues.aY;
+		var lastName = fieldValues.a2;
+		var birthYear = fieldValues.aR;
+		var phoneNumber = fieldValues.a7;
+		var email = fieldValues.aW;
+		var _n0 = _Utils_Tuple3(
+			firstName,
+			lastName,
+			_Utils_Tuple3(birthYear, phoneNumber, email));
+		if (((((!_n0.a.$) && (!_n0.b.$)) && (!_n0.c.a.$)) && (!_n0.c.b.$)) && (!_n0.c.c.$)) {
+			var _n1 = _n0.a;
+			var validFirstName = _n1.b;
+			var _n2 = _n0.b;
+			var validLastName = _n2.b;
+			var _n3 = _n0.c;
+			var _n4 = _n3.a;
+			var validBirthYear = _n4.b;
+			var _n5 = _n3.b;
+			var validPhoneNumber = _n5.b;
+			var _n6 = _n3.c;
+			var validEmail = _n6.b;
+			return author$project$Tutor$Pages$RegistrationPage$RegistrationForm$CompleteRegistrationForm(
+				{aR: validBirthYear, aW: validEmail, aY: validFirstName, a2: validLastName, a7: validPhoneNumber});
+		} else {
+			return author$project$Tutor$Pages$RegistrationPage$RegistrationForm$IncompleteRegistrationForm(fieldValues);
+		}
+	});
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateBirthYear = F2(
+	function (form, string) {
+		return A2(
+			author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateForm,
+			form,
+			function (fieldValues) {
+				return _Utils_update(
+					fieldValues,
+					{
+						aR: A2(author$project$Domain$Utils$FieldValue$fieldValueFromString, author$project$Domain$Utils$BirthYear$makeBirthYear, string)
+					});
+			});
+	});
+var author$project$Domain$Utils$Email$Email = elm$core$Basics$identity;
+var author$project$Domain$Utils$Email$makeEmail = function (string) {
+	return elm$core$Result$Ok(string);
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateEmail = F2(
+	function (form, string) {
+		return A2(
+			author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateForm,
+			form,
+			function (fieldValues) {
+				return _Utils_update(
+					fieldValues,
+					{
+						aW: A2(author$project$Domain$Utils$FieldValue$fieldValueFromString, author$project$Domain$Utils$Email$makeEmail, string)
+					});
+			});
+	});
+var author$project$Domain$Utils$FirstName$FirstName = elm$core$Basics$identity;
+var elm$core$Basics$ge = _Utils_ge;
+var elm$core$String$length = _String_length;
+var author$project$Domain$Utils$FirstName$makeFirstName = function (string) {
+	return ((elm$core$String$length(string) >= 2) && (elm$core$String$length(string) <= 20)) ? elm$core$Result$Ok(string) : elm$core$Result$Err('First name has to have between 2 and 20 characters');
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateFirstName = F2(
+	function (form, string) {
+		return A2(
+			author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateForm,
+			form,
+			function (fieldValues) {
+				return _Utils_update(
+					fieldValues,
+					{
+						aY: A2(author$project$Domain$Utils$FieldValue$fieldValueFromString, author$project$Domain$Utils$FirstName$makeFirstName, string)
+					});
+			});
+	});
+var author$project$Domain$Utils$LastName$LastName = elm$core$Basics$identity;
+var author$project$Domain$Utils$LastName$makeLastName = function (string) {
+	return ((elm$core$String$length(string) >= 1) && (elm$core$String$length(string) <= 20)) ? elm$core$Result$Ok(string) : elm$core$Result$Err('Last name has to have between 1 and 20 characters');
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateLastName = F2(
+	function (form, string) {
+		return A2(
+			author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateForm,
+			form,
+			function (fieldValues) {
+				return _Utils_update(
+					fieldValues,
+					{
+						a2: A2(author$project$Domain$Utils$FieldValue$fieldValueFromString, author$project$Domain$Utils$LastName$makeLastName, string)
+					});
+			});
+	});
+var author$project$Domain$Utils$PhoneNumber$PhoneNumber = elm$core$Basics$identity;
+var author$project$Domain$Utils$PhoneNumber$makePhoneNumber = function (string) {
+	return elm$core$Result$Ok(string);
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updatePhoneNumber = F2(
+	function (form, string) {
+		return A2(
+			author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateForm,
+			form,
+			function (fieldValues) {
+				return _Utils_update(
+					fieldValues,
+					{
+						a7: A2(author$project$Domain$Utils$FieldValue$fieldValueFromString, author$project$Domain$Utils$PhoneNumber$makePhoneNumber, string)
+					});
+			});
+	});
+var author$project$Tutor$Pages$RegistrationPage$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 0:
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							i: A2(author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateFirstName, model.i, string)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 1:
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							i: A2(author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateLastName, model.i, string)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 2:
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							i: A2(author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateBirthYear, model.i, string)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 3:
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							i: A2(author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updatePhoneNumber, model.i, string)
+						}),
+					elm$core$Platform$Cmd$none);
+			default:
+				var string = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							i: A2(author$project$Tutor$Pages$RegistrationPage$RegistrationForm$updateEmail, model.i, string)
+						}),
+					elm$core$Platform$Cmd$none);
+		}
+	});
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
@@ -4820,60 +5102,133 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	}
 };
 var elm$html$Html$div = _VirtualDom_node('div');
-var elm$html$Html$h1 = _VirtualDom_node('h1');
-var elm$html$Html$p = _VirtualDom_node('p');
+var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var author$project$Tutor$Pages$RegistrationPage$layoutPageContainer = F2(
+	function (additionalAttrs, children) {
+		var styles = _List_fromArray(
+			[
+				A2(elm$html$Html$Attributes$style, 'margin', '0 auto'),
+				A2(elm$html$Html$Attributes$style, 'max-width', '960px')
+			]);
+		var attrs = _Utils_ap(styles, additionalAttrs);
+		return A2(elm$html$Html$div, attrs, children);
+	});
+var author$project$Tutor$Pages$RegistrationPage$UpdateBirthYear = function (a) {
+	return {$: 2, a: a};
+};
+var author$project$Tutor$Pages$RegistrationPage$UpdateEmail = function (a) {
+	return {$: 4, a: a};
+};
+var author$project$Tutor$Pages$RegistrationPage$UpdateFirstName = function (a) {
+	return {$: 0, a: a};
+};
+var author$project$Tutor$Pages$RegistrationPage$UpdateLastName = function (a) {
+	return {$: 1, a: a};
+};
+var author$project$Tutor$Pages$RegistrationPage$UpdatePhoneNumber = function (a) {
+	return {$: 3, a: a};
+};
+var author$project$Tutor$Pages$RegistrationPage$layoutRow = function (children) {
+	var styles = _List_fromArray(
+		[
+			A2(elm$html$Html$Attributes$style, 'margin-top', '0.5em')
+		]);
+	var attrs = styles;
+	return A2(elm$html$Html$div, attrs, children);
+};
+var elm$html$Html$input = _VirtualDom_node('input');
+var elm$html$Html$label = _VirtualDom_node('label');
+var elm$html$Html$span = _VirtualDom_node('span');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Tutor$Pages$Registration$pageContents = function (model) {
-	return A2(
-		elm$html$Html$div,
-		_List_Nil,
+var elm$json$Json$Encode$string = _Json_wrap;
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
+var author$project$Tutor$Pages$RegistrationPage$checkBox = function (_n0) {
+	var label = _n0.q;
+	var attrs = _List_fromArray(
+		[
+			elm$html$Html$Attributes$type_('checkbox')
+		]);
+	return author$project$Tutor$Pages$RegistrationPage$layoutRow(
 		_List_fromArray(
 			[
 				A2(
-				elm$html$Html$h1,
+				elm$html$Html$label,
 				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text('Înregistrare repetitor')
-					])),
-				A2(
-				elm$html$Html$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text('TODO: Create form')
+						A2(elm$html$Html$input, attrs, _List_Nil),
+						A2(
+						elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(label)
+							]))
 					]))
 			]));
 };
-var author$project$Tutor$Pages$Registration$view = function (model) {
-	return {
-		U: _List_fromArray(
+var elm$html$Html$button = _VirtualDom_node('button');
+var author$project$Tutor$Pages$RegistrationPage$submitButton = function (_n0) {
+	var label = _n0.q;
+	var styles = _List_fromArray(
+		[
+			A2(elm$html$Html$Attributes$style, 'font', 'inherit')
+		]);
+	var attrs = _Utils_ap(
+		styles,
+		_List_fromArray(
 			[
-				author$project$Tutor$Pages$Registration$pageContents(model)
-			]),
-		as: 'Înregistrare repetitor'
-	};
+				elm$html$Html$Attributes$type_('submit')
+			]));
+	return author$project$Tutor$Pages$RegistrationPage$layoutRow(
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$button,
+				attrs,
+				_List_fromArray(
+					[
+						elm$html$Html$text(label)
+					]))
+			]));
 };
-var elm$browser$Browser$External = function (a) {
+var author$project$Tutor$Pages$RegistrationPage$labelStyles = _List_fromArray(
+	[
+		A2(elm$html$Html$Attributes$style, 'display', 'grid'),
+		A2(elm$html$Html$Attributes$style, 'grid-template-columns', '[label] auto [field] 50%')
+	]);
+var author$project$Tutor$Pages$RegistrationPage$labelTextStyles = _List_fromArray(
+	[
+		A2(elm$html$Html$Attributes$style, 'margin-right', '0.5em'),
+		A2(elm$html$Html$Attributes$style, 'font', 'inherit'),
+		A2(elm$html$Html$Attributes$style, 'text-align', 'right'),
+		A2(elm$html$Html$Attributes$style, 'padding', '4px 0')
+	]);
+var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 1, a: a};
 };
-var elm$browser$Browser$Internal = function (a) {
-	return {$: 0, a: a};
-};
-var elm$browser$Browser$Dom$NotFound = elm$core$Basics$identity;
-var elm$core$Basics$never = function (_n0) {
-	never:
-	while (true) {
-		var nvr = _n0;
-		var $temp$_n0 = nvr;
-		_n0 = $temp$_n0;
-		continue never;
-	}
-};
-var elm$core$Task$Perform = elm$core$Basics$identity;
-var elm$core$Task$succeed = _Scheduler_succeed;
-var elm$core$Task$init = elm$core$Task$succeed(0);
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -4929,6 +5284,219 @@ var elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$json$Json$Decode$string = _Json_decodeString;
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
+};
+var author$project$Tutor$Pages$RegistrationPage$textField = function (_n0) {
+	var label = _n0.q;
+	var placeHolder = _n0.G;
+	var fieldValue = _n0.E;
+	var toMsg = _n0.K;
+	var inputStyles = _List_fromArray(
+		[
+			A2(elm$html$Html$Attributes$style, 'font', 'inherit')
+		]);
+	var _n1 = function () {
+		switch (fieldValue.$) {
+			case 2:
+				return _Utils_Tuple3('', '', 'black');
+			case 1:
+				var textValue = fieldValue.a;
+				var errorMessage = fieldValue.b;
+				return _Utils_Tuple3(textValue, errorMessage, 'red');
+			default:
+				var textValue = fieldValue.a;
+				return _Utils_Tuple3(textValue, 'Bun.', 'green');
+		}
+	}();
+	var inputValue = _n1.a;
+	var fieldInfo = _n1.b;
+	var fieldInfoColor = _n1.c;
+	var fieldInfoStyle = _List_fromArray(
+		[
+			A2(elm$html$Html$Attributes$style, 'grid-column-start', 'field'),
+			A2(elm$html$Html$Attributes$style, 'color', fieldInfoColor)
+		]);
+	return author$project$Tutor$Pages$RegistrationPage$layoutRow(
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$label,
+				author$project$Tutor$Pages$RegistrationPage$labelStyles,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$span,
+						author$project$Tutor$Pages$RegistrationPage$labelTextStyles,
+						_List_fromArray(
+							[
+								elm$html$Html$text(label)
+							])),
+						A2(
+						elm$html$Html$input,
+						_Utils_ap(
+							inputStyles,
+							_List_fromArray(
+								[
+									elm$html$Html$Attributes$placeholder(placeHolder),
+									elm$html$Html$Attributes$value(inputValue),
+									elm$html$Html$Events$onInput(toMsg)
+								])),
+						_List_Nil),
+						A2(
+						elm$html$Html$span,
+						fieldInfoStyle,
+						_List_fromArray(
+							[
+								elm$html$Html$text(fieldInfo)
+							]))
+					]))
+			]));
+};
+var author$project$Tutor$Pages$RegistrationPage$RegistrationForm$getFieldValue = F2(
+	function (form, accessFunction) {
+		return accessFunction(
+			author$project$Tutor$Pages$RegistrationPage$RegistrationForm$incompleteFormFields(form));
+	});
+var elm$html$Html$form = _VirtualDom_node('form');
+var author$project$Tutor$Pages$RegistrationPage$registrationForm = function (form) {
+	var styles = _List_fromArray(
+		[
+			A2(elm$html$Html$Attributes$style, 'max-width', '400px')
+		]);
+	return A2(
+		elm$html$Html$form,
+		styles,
+		_List_fromArray(
+			[
+				author$project$Tutor$Pages$RegistrationPage$textField(
+				{
+					E: A2(
+						author$project$Tutor$Pages$RegistrationPage$RegistrationForm$getFieldValue,
+						form,
+						function ($) {
+							return $.aY;
+						}),
+					q: 'Prenume',
+					G: 'de exemplu George',
+					K: author$project$Tutor$Pages$RegistrationPage$UpdateFirstName
+				}),
+				author$project$Tutor$Pages$RegistrationPage$textField(
+				{
+					E: A2(
+						author$project$Tutor$Pages$RegistrationPage$RegistrationForm$getFieldValue,
+						form,
+						function ($) {
+							return $.a2;
+						}),
+					q: 'Nume de familie',
+					G: 'de exemplu Teodorescu',
+					K: author$project$Tutor$Pages$RegistrationPage$UpdateLastName
+				}),
+				author$project$Tutor$Pages$RegistrationPage$textField(
+				{
+					E: A2(
+						author$project$Tutor$Pages$RegistrationPage$RegistrationForm$getFieldValue,
+						form,
+						function ($) {
+							return $.aR;
+						}),
+					q: 'Anul nașterii',
+					G: 'de exemplu 1979',
+					K: author$project$Tutor$Pages$RegistrationPage$UpdateBirthYear
+				}),
+				author$project$Tutor$Pages$RegistrationPage$textField(
+				{
+					E: A2(
+						author$project$Tutor$Pages$RegistrationPage$RegistrationForm$getFieldValue,
+						form,
+						function ($) {
+							return $.a7;
+						}),
+					q: 'Număr de telefon',
+					G: 'de exemplu 123456789',
+					K: author$project$Tutor$Pages$RegistrationPage$UpdatePhoneNumber
+				}),
+				author$project$Tutor$Pages$RegistrationPage$textField(
+				{
+					E: A2(
+						author$project$Tutor$Pages$RegistrationPage$RegistrationForm$getFieldValue,
+						form,
+						function ($) {
+							return $.aW;
+						}),
+					q: 'Email',
+					G: 'de exemplu george@gmail.com',
+					K: author$project$Tutor$Pages$RegistrationPage$UpdateEmail
+				}),
+				author$project$Tutor$Pages$RegistrationPage$checkBox(
+				{q: 'Sunt de acord cu condițiile de utilizare'}),
+				author$project$Tutor$Pages$RegistrationPage$submitButton(
+				{q: 'Înregistrează'})
+			]));
+};
+var elm$html$Html$h1 = _VirtualDom_node('h1');
+var author$project$Tutor$Pages$RegistrationPage$pageContents = function (model) {
+	return A2(
+		author$project$Tutor$Pages$RegistrationPage$layoutPageContainer,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$h1,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('Înregistrare repetitor')
+					])),
+				author$project$Tutor$Pages$RegistrationPage$registrationForm(model.i)
+			]));
+};
+var author$project$Tutor$Pages$RegistrationPage$view = function (model) {
+	return {
+		aS: _List_fromArray(
+			[
+				author$project$Tutor$Pages$RegistrationPage$pageContents(model)
+			]),
+		bd: 'Înregistrare repetitor'
+	};
+};
+var elm$browser$Browser$External = function (a) {
+	return {$: 1, a: a};
+};
+var elm$browser$Browser$Internal = function (a) {
+	return {$: 0, a: a};
+};
+var elm$browser$Browser$Dom$NotFound = elm$core$Basics$identity;
+var elm$core$Basics$never = function (_n0) {
+	never:
+	while (true) {
+		var nvr = _n0;
+		var $temp$_n0 = nvr;
+		_n0 = $temp$_n0;
+		continue never;
+	}
+};
+var elm$core$Task$Perform = elm$core$Basics$identity;
+var elm$core$Task$succeed = _Scheduler_succeed;
+var elm$core$Task$init = elm$core$Task$succeed(0);
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -5015,7 +5583,6 @@ var elm$core$Task$perform = F2(
 		return elm$core$Task$command(
 			A2(elm$core$Task$map, toMessage, task));
 	});
-var elm$core$String$length = _String_length;
 var elm$core$String$slice = _String_slice;
 var elm$core$String$dropLeft = F2(
 	function (n, string) {
@@ -5037,10 +5604,9 @@ var elm$core$String$left = F2(
 		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
 	});
 var elm$core$String$contains = _String_contains;
-var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {Z: fragment, _: host, ad: path, af: port_, ai: protocol, aj: query};
+		return {ak: fragment, am: host, at: path, av: port_, az: protocol, aA: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
@@ -5145,7 +5711,16 @@ var elm$url$Url$fromString = function (str) {
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$document = _Browser_document;
-var author$project$Tutor$Pages$Registration$main = elm$browser$Browser$document(
-	{aC: author$project$Tutor$Pages$Registration$init, aL: author$project$Tutor$Pages$Registration$subscriptions, aM: author$project$Tutor$Pages$Registration$update, aO: author$project$Tutor$Pages$Registration$view});
-_Platform_export({'Tutor':{'Pages':{'Registration':{'init':author$project$Tutor$Pages$Registration$main(
+var elm$core$Platform$Sub$batch = _Platform_batch;
+var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
+var author$project$Tutor$Pages$RegistrationPage$main = elm$browser$Browser$document(
+	{
+		a0: author$project$Tutor$Pages$RegistrationPage$init,
+		bc: function (_n0) {
+			return elm$core$Platform$Sub$none;
+		},
+		be: author$project$Tutor$Pages$RegistrationPage$update,
+		bg: author$project$Tutor$Pages$RegistrationPage$view
+	});
+_Platform_export({'Tutor':{'Pages':{'RegistrationPage':{'init':author$project$Tutor$Pages$RegistrationPage$main(
 	elm$json$Json$Decode$succeed(0))(0)}}}});}(this));
