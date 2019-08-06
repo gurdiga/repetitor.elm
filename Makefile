@@ -26,8 +26,8 @@ edit:
 build: elm.json tutor-pages
 
 tutor-pages: \
-	src/Tutor/Pages/Registration.elm \
-	src/Tutor/Pages/Authentication.elm
+	src/Tutor/Pages/RegistrationPage.elm \
+	src/Tutor/Pages/AuthenticationPage.elm
 	@for module_path in $?; do \
 		elm_module_name=`head -n1 $$module_path | grep -Po '(?<=module )[A-Za-z0-9.]+'`; \
 		path_name=`grep -Po '(?<=-- path name: )[a-z]+' $$module_path` || \
