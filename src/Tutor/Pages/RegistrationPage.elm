@@ -87,20 +87,29 @@ pageContents model =
         , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
         , let
             stringToParse =
-                " 00  123 4 5 "
+                "069829583"
           in
           pre [ style "white-space" "normal" ]
             [ stringToParse |> Debug.toString |> text
             , text " => "
-            , Parser.run spacedDigits stringToParse |> Debug.toString |> text
+            , parsePhoneNumber stringToParse |> Debug.toString |> text
             ]
         ]
+
+
+parsePhoneNumber : String -> Result (List DeadEnd) (List String)
+parsePhoneNumber input =
+    Parser.run spacedDigits input
+
+
+
+--TODO: Verify the result and capture possible errors?
 
 
 spacedDigits : Parser (List String)
 spacedDigits =
     let
-        f digits digitChunk =
+        processChunk digits digitChunk =
             if String.length digitChunk > 0 then
                 Loop (digitChunk :: digits)
 
@@ -109,9 +118,12 @@ spacedDigits =
     in
     loop []
         (\digits ->
-            succeed (f digits)
-                |. chompWhile (\c -> c == ' ' || c == '\t')
-                |= (chompWhile Char.isDigit |> getChompedString)
+            oneOf
+                [ succeed (processChunk digits)
+                    |. chompWhile (\c -> c == ' ' || c == '\t')
+                    |= (chompWhile Char.isDigit |> getChompedString)
+                    |. chompWhile (\c -> c == ' ' || c == '\t')
+                ]
         )
 
 
