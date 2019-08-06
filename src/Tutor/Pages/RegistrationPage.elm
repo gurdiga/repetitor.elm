@@ -5,6 +5,7 @@ import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, pre, span, text)
 import Html.Attributes exposing (placeholder, style, type_, value)
 import Html.Events exposing (onInput)
+import Parser exposing (..)
 import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updateLastName, updatePhoneNumber)
 
 
@@ -84,7 +85,34 @@ pageContents model =
         [ h1 [] [ text "Înregistrare repetitor" ]
         , registrationForm model.form
         , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
+        , let
+            stringToParse =
+                " 00  123 4 5 "
+          in
+          pre [ style "white-space" "normal" ]
+            [ stringToParse |> Debug.toString |> text
+            , text " => "
+            , Parser.run spacedDigits stringToParse |> Debug.toString |> text
+            ]
         ]
+
+
+spacedDigits : Parser (List String)
+spacedDigits =
+    let
+        f digits digitChunk =
+            if String.length digitChunk > 0 then
+                Loop (digitChunk :: digits)
+
+            else
+                Done (List.reverse digits)
+    in
+    loop []
+        (\digits ->
+            succeed (f digits)
+                |. chompWhile (\c -> c == ' ' || c == '\t')
+                |= (chompWhile Char.isDigit |> getChompedString)
+        )
 
 
 layoutPageContainer : List (Attribute Msg) -> List (Html Msg) -> Html Msg
