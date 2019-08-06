@@ -34,7 +34,7 @@ tutor-pages: \
 			{ echo "\nModule $$module_path does not have a path name.\n"; exit 1; }; \
 		echo "$$module_path -> $$path_name"; \
 		sed "s/ELM_MODULE_NAME/$$elm_module_name/" docs/page-template.html > docs/$$path_name/index.html; \
-		elm make --optimize $$module_path --output=docs/$$path_name/main.js; \
+		elm make --optimize $$module_path --output=docs/$$path_name/main.js || exit 1; \
 	done
 
 elm.json:
