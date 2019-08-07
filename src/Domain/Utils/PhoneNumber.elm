@@ -1,15 +1,15 @@
-module Domain.Utils.MoldovaPhoneNumber exposing (MoldovaPhoneNumber, makeMoldovaPhoneNumber, phoneNumberToString)
+module Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
 
 import Parser exposing ((|.), (|=), Parser, chompWhile, end, getChompedString, succeed)
 
 
-type MoldovaPhoneNumber
-    = MoldovaPhoneNumber String
+type PhoneNumber
+    = PhoneNumber String
 
 
-makeMoldovaPhoneNumber : String -> Result String MoldovaPhoneNumber
-makeMoldovaPhoneNumber string =
-    case string |> String.replace " " "" |> Parser.run digitParser of
+makePhoneNumber : String -> Result String PhoneNumber
+makePhoneNumber string =
+    case string |> String.replace " " "" |> Parser.run digitStringParser of
         Ok parsedDigits ->
             makePhoneNumberFromDigits parsedDigits
 
@@ -22,7 +22,7 @@ makeMoldovaPhoneNumber string =
                     Err "Eroare în program la validarea numărului de telefon."
 
 
-makePhoneNumberFromDigits : String -> Result String MoldovaPhoneNumber
+makePhoneNumberFromDigits : String -> Result String PhoneNumber
 makePhoneNumberFromDigits digits =
     let
         makeErr string =
@@ -38,7 +38,7 @@ makePhoneNumberFromDigits digits =
         makeErr "Numărul de telefon trebuie să înceapă cu 060-069 sau 076-079"
 
     else
-        Ok (MoldovaPhoneNumber digits)
+        Ok (PhoneNumber digits)
 
 
 validPrefixes : List String
@@ -53,13 +53,13 @@ validPrefixes =
     prefixRange 60 69 ++ prefixRange 76 79
 
 
-digitParser : Parser String
-digitParser =
+digitStringParser : Parser String
+digitStringParser =
     succeed identity
         |= (chompWhile Char.isDigit |> getChompedString)
         |. end
 
 
-phoneNumberToString : MoldovaPhoneNumber -> String
-phoneNumberToString (MoldovaPhoneNumber string) =
+phoneNumberToString : PhoneNumber -> String
+phoneNumberToString (PhoneNumber string) =
     string
