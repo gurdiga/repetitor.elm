@@ -84,37 +84,8 @@ pageContents model =
     layoutPageContainer []
         [ h1 [] [ text "Înregistrare repetitor" ]
         , registrationForm model.form
+        , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
         ]
-
-
-parsePhoneNumber : String -> Result (List DeadEnd) (List String)
-parsePhoneNumber input =
-    Parser.run spacedDigits input
-
-
-
---TODO: Verify the result and capture possible errors?
-
-
-spacedDigits : Parser (List String)
-spacedDigits =
-    let
-        processChunk digits digitChunk =
-            if String.length digitChunk > 0 then
-                Loop (digitChunk :: digits)
-
-            else
-                Done (List.reverse digits)
-    in
-    loop []
-        (\digits ->
-            oneOf
-                [ succeed (processChunk digits)
-                    |. chompWhile (\c -> c == ' ' || c == '\t')
-                    |= (chompWhile Char.isDigit |> getChompedString)
-                    |. chompWhile (\c -> c == ' ' || c == '\t')
-                ]
-        )
 
 
 layoutPageContainer : List (Attribute Msg) -> List (Html Msg) -> Html Msg

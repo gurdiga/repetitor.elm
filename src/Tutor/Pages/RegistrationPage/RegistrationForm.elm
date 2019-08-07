@@ -5,7 +5,7 @@ import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
 import Domain.Utils.FieldValue exposing (FieldValue(..), fieldValueFromString, makeValidFieldValue)
 import Domain.Utils.FirstName exposing (FirstName, firstNameToString, makeFirstName)
 import Domain.Utils.LastName exposing (LastName, lastNameToString, makeLastName)
-import Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
+import Domain.Utils.MoldovaPhoneNumber exposing (MoldovaPhoneNumber, makeMoldovaPhoneNumber, phoneNumberToString)
 
 
 type RegistrationForm
@@ -17,7 +17,7 @@ type alias FieldValueSet =
     { firstName : FieldValue FirstName
     , lastName : FieldValue LastName
     , birthYear : FieldValue BirthYear
-    , phoneNumber : FieldValue PhoneNumber
+    , phoneNumber : FieldValue MoldovaPhoneNumber
     , email : FieldValue Email
     }
 
@@ -26,7 +26,7 @@ type alias ValueSet =
     { firstName : FirstName
     , lastName : LastName
     , birthYear : BirthYear
-    , phoneNumber : PhoneNumber
+    , phoneNumber : MoldovaPhoneNumber
     , email : Email
     }
 
@@ -59,7 +59,7 @@ updateBirthYear form string =
 
 updatePhoneNumber : RegistrationForm -> String -> RegistrationForm
 updatePhoneNumber form string =
-    updateForm form (\fieldValues -> { fieldValues | phoneNumber = fieldValueFromString makePhoneNumber string })
+    updateForm form (\fieldValues -> { fieldValues | phoneNumber = fieldValueFromString makeMoldovaPhoneNumber string })
 
 
 updateEmail : RegistrationForm -> String -> RegistrationForm
