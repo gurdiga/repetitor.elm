@@ -16,7 +16,7 @@ makeMoldovaPhoneNumber string =
         Err errors ->
             case errors of
                 error :: [] ->
-                    Err ("Număr incorect: simbolul al " ++ String.fromInt error.col ++ "-ea nu este o cifră.")
+                    Err ("Număr incorect: simbolul de pe poziția " ++ String.fromInt error.col ++ " nu este o cifră.")
 
                 _ ->
                     Err "Eroare în program la validarea numărului de telefon."
