@@ -1,5 +1,4 @@
-default:
-	@echo Make what?
+default: compile
 
 install:
 	wget https://github.com/elm/compiler/releases/download/0.19.0/installer-for-mac.pkg
@@ -23,12 +22,19 @@ e: edit
 edit:
 	mine .
 
-build: elm.json tutor-pages
+TUTOR_PAGES = $(wildcard src/Tutor/Pages/*Page.elm)
 
-tutor-pages: \
-	src/Tutor/Pages/RegistrationPage.elm \
-	src/Tutor/Pages/AuthenticationPage.elm
-	@for module_path in $?; do \
+compile: elm.json compile-tutor-pages
+compile-tutor-pages:
+	@for module_path in $(TUTOR_PAGES); do \
+		echo "$$module_path"; \
+		elm make $$module_path --output=/dev/null || exit 1; \
+	done
+
+build: elm.json build-tutor-pages
+
+build-tutor-pages:
+	@for module_path in $(TUTOR_PAGES); do \
 		elm_module_name=`head -n1 $$module_path | grep -Po '(?<=module )[A-Za-z0-9.]+'`; \
 		path_name=`grep -Po '(?<=-- path name: )[a-z]+' $$module_path` || \
 			{ echo "\nModule $$module_path does not have a path name.\n"; exit 1; }; \
