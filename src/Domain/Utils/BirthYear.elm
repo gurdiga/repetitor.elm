@@ -5,8 +5,8 @@ type BirthYear
     = BirthYear Int
 
 
-makeBirthYear : String -> Result String BirthYear
-makeBirthYear string =
+makeBirthYear : Int -> String -> Result String BirthYear
+makeBirthYear currentYear string =
     let
         trimedString =
             String.trim string
@@ -14,7 +14,7 @@ makeBirthYear string =
         int =
             String.toInt trimedString
                 |> Maybe.map BirthYear
-                |> Result.fromMaybe ("An de naștere invalid: " ++ trimedString)
+                |> Result.fromMaybe ("Anul nașterii este incorect: „" ++ trimedString ++ "”")
 
         saneInt =
             case int of
@@ -22,7 +22,7 @@ makeBirthYear string =
                     Err error
 
                 Ok (BirthYear year) ->
-                    case reasonToReject year of
+                    case reasonToReject year currentYear of
                         Nothing ->
                             Ok (BirthYear year)
 
@@ -35,16 +35,19 @@ makeBirthYear string =
     result
 
 
-reasonToReject : Int -> Maybe String
-reasonToReject int =
+reasonToReject : Int -> Int -> Maybe String
+reasonToReject int currentYear =
     if int <= 0 then
-        Just "Incorrect number."
+        Just "Anul nașterii nu poate fi negativ."
+
+    else if int > currentYear then
+        Just "Anul nașterii este în viitor. Călătorii în timp nu se pot înregistra."
 
     else if int > currentYear - 7 then
-        Just "You are probably too young"
+        Just "Sunteți prea tînăr."
 
     else if int < currentYear - 100 then
-        Just "You are probably too old"
+        Just "Sunteți prea bătrîn."
 
     else
         Nothing
@@ -53,11 +56,6 @@ reasonToReject int =
 birthYearToString : BirthYear -> String
 birthYearToString (BirthYear int) =
     String.fromInt int
-
-
-currentYear : Int
-currentYear =
-    2019
 
 
 

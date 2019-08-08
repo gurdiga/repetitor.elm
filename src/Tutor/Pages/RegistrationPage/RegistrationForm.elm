@@ -52,9 +52,9 @@ updateLastName form string =
     updateForm form (\fieldValues -> { fieldValues | lastName = fieldValueFromString makeLastName string })
 
 
-updateBirthYear : RegistrationForm -> String -> RegistrationForm
-updateBirthYear form string =
-    updateForm form (\fieldValues -> { fieldValues | birthYear = fieldValueFromString makeBirthYear string })
+updateBirthYear : RegistrationForm -> String -> Int -> RegistrationForm
+updateBirthYear form string currentYear =
+    updateForm form (\fieldValues -> { fieldValues | birthYear = fieldValueFromString (makeBirthYear currentYear) string })
 
 
 updatePhoneNumber : RegistrationForm -> String -> RegistrationForm

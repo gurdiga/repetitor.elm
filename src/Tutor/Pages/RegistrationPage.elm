@@ -5,7 +5,8 @@ import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, pre, span, text)
 import Html.Attributes exposing (placeholder, style, type_, value)
 import Html.Events exposing (onInput)
-import Parser exposing (..)
+import Task
+import Time
 import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updateLastName, updatePhoneNumber)
 
 
@@ -27,13 +28,26 @@ main =
 
 
 type alias Model =
-    { form : RegistrationForm }
+    { form : RegistrationForm
+    , clock :
+        { zone : Time.Zone
+        , time : Time.Posix
+        }
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { form = emptyForm }
-    , Cmd.none
+    ( { form = emptyForm
+      , clock =
+            { zone = Time.utc
+            , time = Time.millisToPosix 0
+            }
+      }
+    , Cmd.batch
+        [ Task.perform AdjustTimeZone Time.here
+        , Task.perform AdjustTime Time.now
+        ]
     )
 
 
@@ -47,25 +61,42 @@ type Msg
     | UpdateBirthYear String
     | UpdatePhoneNumber String
     | UpdateEmail String
+    | AdjustTime Time.Posix
+    | AdjustTimeZone Time.Zone
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg ({ form, clock } as model) =
     case msg of
         UpdateFirstName string ->
-            ( { model | form = updateFirstName model.form string }, Cmd.none )
+            ( { model | form = updateFirstName form string }, Cmd.none )
 
         UpdateLastName string ->
-            ( { model | form = updateLastName model.form string }, Cmd.none )
+            ( { model | form = updateLastName form string }, Cmd.none )
 
         UpdateBirthYear string ->
-            ( { model | form = updateBirthYear model.form string }, Cmd.none )
+            ( { model | form = updateBirthYear form string (getYearFromClock clock) }, Cmd.none )
 
         UpdatePhoneNumber string ->
-            ( { model | form = updatePhoneNumber model.form string }, Cmd.none )
+            ( { model | form = updatePhoneNumber form string }, Cmd.none )
 
         UpdateEmail string ->
-            ( { model | form = updateEmail model.form string }, Cmd.none )
+            ( { model | form = updateEmail form string }, Cmd.none )
+
+        AdjustTime newTime ->
+            ( { model | clock = { clock | time = newTime } }
+            , Cmd.none
+            )
+
+        AdjustTimeZone newZone ->
+            ( { model | clock = { clock | zone = newZone } }
+            , Cmd.none
+            )
+
+
+getYearFromClock : { zone : Time.Zone, time : Time.Posix } -> Int
+getYearFromClock { zone, time } =
+    Time.toYear zone time
 
 
 
@@ -85,6 +116,17 @@ pageContents model =
         [ h1 [] [ text "Înregistrare repetitor" ]
         , registrationForm model.form
         , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
+        , let
+            hour =
+                String.fromInt (Time.toHour model.clock.zone model.clock.time)
+
+            minute =
+                String.fromInt (Time.toMinute model.clock.zone model.clock.time)
+
+            second =
+                String.fromInt (Time.toSecond model.clock.zone model.clock.time)
+          in
+          h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
         ]
 
 
