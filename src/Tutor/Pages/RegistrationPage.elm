@@ -116,17 +116,6 @@ pageContents model =
         [ h1 [] [ text "Înregistrare repetitor" ]
         , registrationForm model.form
         , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
-        , let
-            hour =
-                String.fromInt (Time.toHour model.clock.zone model.clock.time)
-
-            minute =
-                String.fromInt (Time.toMinute model.clock.zone model.clock.time)
-
-            second =
-                String.fromInt (Time.toSecond model.clock.zone model.clock.time)
-          in
-          h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
         ]
 
 
