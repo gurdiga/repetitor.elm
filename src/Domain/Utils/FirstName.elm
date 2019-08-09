@@ -1,5 +1,7 @@
 module Domain.Utils.FirstName exposing (FirstName, firstNameToString, makeFirstName)
 
+import Domain.Utils.String exposing (isAllLetters)
+
 
 type FirstName
     = FirstName String
@@ -7,12 +9,21 @@ type FirstName
 
 makeFirstName : String -> Result String FirstName
 makeFirstName string =
-    -- TODO: trim and validate (regex or parser)
-    if String.length string >= 2 && String.length string <= 20 then
-        Ok (FirstName string)
+    let
+        trimmedString =
+            String.trim string
+    in
+    if String.length trimmedString < 2 then
+        Err "Prenumele pare să fie incorect. (O singură litera?!)"
+
+    else if String.length trimmedString > 30 then
+        Err "Prenumele pare să fie incorect. (Mai mult de 30 de litere?!)"
+
+    else if not (isAllLetters trimmedString) then
+        Err "Prenumele pare să fie incorect. (Are simboluri care nu sunt litere?!)"
 
     else
-        Err "First name has to have between 2 and 20 characters"
+        Ok (FirstName trimmedString)
 
 
 firstNameToString : FirstName -> String
