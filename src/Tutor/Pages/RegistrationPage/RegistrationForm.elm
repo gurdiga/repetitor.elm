@@ -2,7 +2,7 @@ module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldValueSet, Re
 
 import Domain.Utils.BirthYear exposing (BirthYear, birthYearToString, makeBirthYear)
 import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
-import Domain.Utils.FieldValue exposing (FieldValue(..), fieldValueFromString, makeValidFieldValue)
+import Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, makeValidFieldValue)
 import Domain.Utils.FirstName exposing (FirstName, firstNameToString, makeFirstName)
 import Domain.Utils.LastName exposing (LastName, lastNameToString, makeLastName)
 import Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
@@ -44,47 +44,32 @@ emptyForm =
 
 updateFirstName : RegistrationForm -> String -> RegistrationForm
 updateFirstName form string =
-    updateForm form (\fieldValues -> { fieldValues | firstName = fieldValueFromString makeFirstName string })
+    updateForm form (\fieldValues -> { fieldValues | firstName = fieldFieldValueFromString makeFirstName string })
 
 
 updateLastName : RegistrationForm -> String -> RegistrationForm
 updateLastName form string =
-    updateForm form (\fieldValues -> { fieldValues | lastName = fieldValueFromString makeLastName string })
+    updateForm form (\fieldValues -> { fieldValues | lastName = fieldFieldValueFromString makeLastName string })
 
 
 updateBirthYear : RegistrationForm -> String -> Int -> RegistrationForm
 updateBirthYear form string currentYear =
-    updateForm form (\fieldValues -> { fieldValues | birthYear = fieldValueFromString (makeBirthYear currentYear) string })
+    updateForm form (\fieldValues -> { fieldValues | birthYear = fieldFieldValueFromString (makeBirthYear currentYear) string })
 
 
 updatePhoneNumber : RegistrationForm -> String -> RegistrationForm
 updatePhoneNumber form string =
-    updateForm form (\fieldValues -> { fieldValues | phoneNumber = fieldValueFromString makePhoneNumber string })
+    updateForm form (\fieldValues -> { fieldValues | phoneNumber = fieldFieldValueFromString makePhoneNumber string })
 
 
 updateEmail : RegistrationForm -> String -> RegistrationForm
 updateEmail form string =
-    updateForm form (\fieldValues -> { fieldValues | email = fieldValueFromString makeEmail string })
+    updateForm form (\fieldValues -> { fieldValues | email = fieldFieldValueFromString makeEmail string })
 
 
 getFieldValue : RegistrationForm -> (FieldValueSet -> FieldValue a) -> FieldValue a
 getFieldValue form accessFunction =
     incompleteFormFields form |> accessFunction
-
-
-incompleteFormFields : RegistrationForm -> FieldValueSet
-incompleteFormFields form =
-    case form of
-        IncompleteRegistrationForm fields ->
-            fields
-
-        CompleteRegistrationForm { firstName, lastName, birthYear, phoneNumber, email } ->
-            { firstName = makeValidFieldValue firstName firstNameToString
-            , lastName = makeValidFieldValue lastName lastNameToString
-            , birthYear = makeValidFieldValue birthYear birthYearToString
-            , phoneNumber = makeValidFieldValue phoneNumber phoneNumberToString
-            , email = makeValidFieldValue email emailToString
-            }
 
 
 updateForm : RegistrationForm -> (FieldValueSet -> FieldValueSet) -> RegistrationForm
@@ -105,3 +90,18 @@ updateForm form updateFunction =
 
         _ ->
             IncompleteRegistrationForm fieldValues
+
+
+incompleteFormFields : RegistrationForm -> FieldValueSet
+incompleteFormFields form =
+    case form of
+        IncompleteRegistrationForm fields ->
+            fields
+
+        CompleteRegistrationForm { firstName, lastName, birthYear, phoneNumber, email } ->
+            { firstName = makeValidFieldValue firstName firstNameToString
+            , lastName = makeValidFieldValue lastName lastNameToString
+            , birthYear = makeValidFieldValue birthYear birthYearToString
+            , phoneNumber = makeValidFieldValue phoneNumber phoneNumberToString
+            , email = makeValidFieldValue email emailToString
+            }
