@@ -1,4 +1,4 @@
-module Domain.Utils.FieldValue exposing (FieldValue(..), fieldValueFromString, makeValidFieldValue)
+module Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, makeValidFieldValue)
 
 
 type alias ErrorMessage =
@@ -11,14 +11,20 @@ type FieldValue a
     | EmptyFieldValue
 
 
-fieldValueFromString : (String -> Result String a) -> String -> FieldValue a
-fieldValueFromString makeFunction string =
+fieldFieldValueFromString : (String -> Result String a) -> String -> FieldValue a
+fieldFieldValueFromString makeFunction string =
     case makeFunction string of
         Ok value ->
             ValidFieldValue string value
 
         Err errorMessage ->
-            InvalidFieldValue string errorMessage
+            InvalidFieldValue string
+                (if string == "" then
+                    "Lipsește valoarea."
+
+                 else
+                    errorMessage
+                )
 
 
 makeValidFieldValue : a -> (a -> String) -> FieldValue a
