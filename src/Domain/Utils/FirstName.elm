@@ -22,6 +22,9 @@ makeFirstName string =
     else if not (allValidSymbols trimmedString) then
         Err "Prenumele pare să fie incorect. (Are simboluri care nu sunt litere?!)"
 
+    else if String.right 1 trimmedString == "-" then
+        Err "Prenumele pare să fie incorect. (Se termină cu liniuță?!)"
+
     else
         Ok (FirstName trimmedString)
 
