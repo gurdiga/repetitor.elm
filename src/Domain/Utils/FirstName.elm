@@ -1,6 +1,6 @@
 module Domain.Utils.FirstName exposing (FirstName, firstNameToString, makeFirstName)
 
-import Domain.Utils.String exposing (isAllLetters)
+import Domain.Utils.Name exposing (allValidSymbols)
 
 
 type FirstName
@@ -19,7 +19,7 @@ makeFirstName string =
     else if String.length trimmedString > 30 then
         Err "Prenumele pare să fie incorect. (Mai mult de 30 de litere?!)"
 
-    else if not (isAllLetters trimmedString) then
+    else if not (allValidSymbols trimmedString) then
         Err "Prenumele pare să fie incorect. (Are simboluri care nu sunt litere?!)"
 
     else
