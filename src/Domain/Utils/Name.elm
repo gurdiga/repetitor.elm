@@ -1,13 +1,13 @@
-module Domain.Utils.Name exposing (allValidSymbols)
+module Domain.Utils.Name exposing (validateName)
 
 
-allValidSymbols : String -> Bool
-allValidSymbols string =
-    let
-        isValidSymbol c =
-            List.member c validSymbols
+validateName : String -> (String -> a) -> String -> Result String a
+validateName label toValue string =
+    if String.length string < 2 then
+        Err (label ++ " pare să fie incorect. (O singură litera?!)")
 
-        validSymbols =
-            String.toList "abcdefghijklmnopqrstuvwxyzăîâțţșş -"
-    in
-    string |> String.toLower |> String.all isValidSymbol
+    else if String.length string > 30 then
+        Err (label ++ " pare să fie incorect. (Mai mult de 30 de litere?!)")
+
+    else
+        Ok (toValue string)
