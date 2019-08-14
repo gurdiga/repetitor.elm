@@ -2,12 +2,13 @@ module Tutor.Pages.RegistrationPage exposing (main)
 
 import Browser
 import Domain.Utils.FieldValue exposing (FieldValue(..))
-import Html exposing (Attribute, Html, button, div, h1, input, pre, span, text)
-import Html.Attributes exposing (placeholder, style, type_, value)
+import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
+import Html.Attributes exposing (placeholder, required, style, type_, value)
 import Html.Events exposing (onInput)
 import Task
 import Time
 import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updateLastName, updatePhoneNumber)
+import UI.Utils.FieldType exposing (InputType(..), inputTypeToString)
 
 
 
@@ -125,6 +126,7 @@ layoutPageContainer additionalAttrs children =
         styles =
             [ style "margin" "0 auto"
             , style "max-width" "960px"
+            , style "font-size" "20px"
             ]
 
         attrs =
@@ -140,18 +142,48 @@ registrationForm form =
             [ style "max-width" "400px" ]
     in
     Html.form styles
-        [ textField { label = "Prenume", placeHolder = "de exemplu George", fieldValue = getFieldValue form .firstName, toMsg = UpdateFirstName }
-        , textField { label = "Nume de familie", placeHolder = "de exemplu Teodorescu", fieldValue = getFieldValue form .lastName, toMsg = UpdateLastName }
-        , textField { label = "Anul nașterii", placeHolder = "de exemplu 1979", fieldValue = getFieldValue form .birthYear, toMsg = UpdateBirthYear }
-        , textField { label = "Număr de telefon", placeHolder = "de exemplu 123456789", fieldValue = getFieldValue form .phoneNumber, toMsg = UpdatePhoneNumber }
-        , textField { label = "Email", placeHolder = "de exemplu george@gmail.com", fieldValue = getFieldValue form .email, toMsg = UpdateEmail }
+        [ textField
+            { label = "Prenume"
+            , note = "De exemplu Petru sau Maria."
+            , fieldValue = getFieldValue form .firstName
+            , toMsg = UpdateFirstName
+            , inputType = Text
+            }
+        , textField
+            { label = "Nume de familie"
+            , note = "De exemplu Teodorescu."
+            , fieldValue = getFieldValue form .lastName
+            , toMsg = UpdateLastName
+            , inputType = Text
+            }
+        , textField
+            { label = "Anul nașterii"
+            , note = "de exemplu 1979"
+            , fieldValue = getFieldValue form .birthYear
+            , toMsg = UpdateBirthYear
+            , inputType = Number
+            }
+        , textField
+            { label = "Număr de telefon"
+            , note = "de exemplu 123456789"
+            , fieldValue = getFieldValue form .phoneNumber
+            , toMsg = UpdatePhoneNumber
+            , inputType = PhoneNumber
+            }
+        , textField
+            { label = "Email"
+            , note = "de exemplu george@gmail.com"
+            , fieldValue = getFieldValue form .email
+            , toMsg = UpdateEmail
+            , inputType = Email
+            }
         , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
         , submitButton { label = "Înregistrează" }
         ]
 
 
-textField : { label : String, placeHolder : String, fieldValue : FieldValue a, toMsg : String -> Msg } -> Html Msg
-textField { label, placeHolder, fieldValue, toMsg } =
+textField : { label : String, note : String, fieldValue : FieldValue a, toMsg : String -> Msg, inputType : InputType } -> Html Msg
+textField { label, note, fieldValue, toMsg, inputType } =
     let
         ( inputValue, fieldInfo, fieldInfoColor ) =
             case fieldValue of
@@ -164,29 +196,35 @@ textField { label, placeHolder, fieldValue, toMsg } =
                 ValidFieldValue textValue _ ->
                     ( textValue, "Bun.", "green" )
 
+        labelStyles =
+            [ style "margin-right" "0.5em"
+            , style "font" "inherit"
+            , style "text-align" "right"
+            , style "padding" "4px 0"
+            ]
+
         inputStyles =
             [ style "font" "inherit"
             ]
 
-        fieldInfoStyle =
+        noteStyles =
+            [ style "font-size" "0.75em"
+            , style "opacity" "0.5"
+            , style "grid-column-start" "field"
+            , style "margin" "0.2em 0 0"
+            ]
+
+        errorMessageStyles =
             [ style "grid-column-start" "field"
             , style "color" fieldInfoColor
             ]
     in
     layoutRow
-        [ Html.label labelStyles
-            [ span labelTextStyles [ text label ]
-            , input (inputStyles ++ [ placeholder placeHolder, value inputValue, onInput toMsg ]) []
-            , span fieldInfoStyle [ text fieldInfo ]
-            ]
+        [ Html.label labelStyles [ text label ]
+        , input (inputStyles ++ [ value inputValue, onInput toMsg, required True, type_ (inputTypeToString inputType) ]) []
+        , p noteStyles [ text note ]
+        , span errorMessageStyles [ text fieldInfo ]
         ]
-
-
-labelStyles : List (Attribute msg)
-labelStyles =
-    [ style "display" "grid"
-    , style "grid-template-columns" "[label] auto [field] 50%"
-    ]
 
 
 submitButton : { label : String } -> Html Msg
@@ -217,20 +255,14 @@ checkBox { label } =
         ]
 
 
-labelTextStyles : List (Attribute msg)
-labelTextStyles =
-    [ style "margin-right" "0.5em"
-    , style "font" "inherit"
-    , style "text-align" "right"
-    , style "padding" "4px 0"
-    ]
-
-
 layoutRow : List (Html Msg) -> Html Msg
 layoutRow children =
     let
         styles =
-            [ style "margin-top" "0.5em" ]
+            [ style "margin-top" "0.5em"
+            , style "display" "grid"
+            , style "grid-template-columns" "[label] auto [field] 50%"
+            ]
 
         attrs =
             styles
