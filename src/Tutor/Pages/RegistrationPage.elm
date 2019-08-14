@@ -3,7 +3,7 @@ module Tutor.Pages.RegistrationPage exposing (main)
 import Browser
 import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
-import Html.Attributes exposing (placeholder, required, style, type_, value)
+import Html.Attributes exposing (for, id, placeholder, required, style, type_, value)
 import Html.Events exposing (onInput)
 import Task
 import Time
@@ -143,35 +143,40 @@ registrationForm form =
     in
     Html.form styles
         [ textField
-            { label = "Prenume"
+            { domId = "first-name"
+            , label = "Prenume"
             , note = "De exemplu Petru sau Maria."
             , fieldValue = getFieldValue form .firstName
             , toMsg = UpdateFirstName
             , inputType = Text
             }
         , textField
-            { label = "Nume de familie"
+            { domId = "last-name"
+            , label = "Nume de familie"
             , note = "De exemplu Teodorescu."
             , fieldValue = getFieldValue form .lastName
             , toMsg = UpdateLastName
             , inputType = Text
             }
         , textField
-            { label = "Anul nașterii"
+            { domId = "birth-year"
+            , label = "Anul nașterii"
             , note = "de exemplu 1979"
             , fieldValue = getFieldValue form .birthYear
             , toMsg = UpdateBirthYear
             , inputType = Number
             }
         , textField
-            { label = "Număr de telefon"
+            { domId = "phone-number"
+            , label = "Număr de telefon"
             , note = "de exemplu 123456789"
             , fieldValue = getFieldValue form .phoneNumber
             , toMsg = UpdatePhoneNumber
             , inputType = PhoneNumber
             }
         , textField
-            { label = "Email"
+            { domId = "email"
+            , label = "Email"
             , note = "de exemplu george@gmail.com"
             , fieldValue = getFieldValue form .email
             , toMsg = UpdateEmail
@@ -182,8 +187,8 @@ registrationForm form =
         ]
 
 
-textField : { label : String, note : String, fieldValue : FieldValue a, toMsg : String -> Msg, inputType : InputType } -> Html Msg
-textField { label, note, fieldValue, toMsg, inputType } =
+textField : { domId : String, label : String, note : String, fieldValue : FieldValue a, toMsg : String -> Msg, inputType : InputType } -> Html Msg
+textField { domId, label, note, fieldValue, toMsg, inputType } =
     let
         ( inputValue, fieldInfo, fieldInfoColor ) =
             case fieldValue of
@@ -220,8 +225,8 @@ textField { label, note, fieldValue, toMsg, inputType } =
             ]
     in
     layoutRow
-        [ Html.label labelStyles [ text label ]
-        , input (inputStyles ++ [ value inputValue, onInput toMsg, required True, type_ (inputTypeToString inputType) ]) []
+        [ Html.label (labelStyles ++ [ for domId ]) [ text label ]
+        , input (inputStyles ++ [ id domId, value inputValue, onInput toMsg, required True, type_ (inputTypeToString inputType) ]) []
         , p noteStyles [ text note ]
         , span errorMessageStyles [ text fieldInfo ]
         ]
