@@ -1,10 +1,9 @@
-module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldValueSet, RegistrationForm, ValueSet, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updateLastName, updatePhoneNumber)
+module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldValueSet, RegistrationForm, ValueSet, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updatePhoneNumber)
 
 import Domain.Utils.BirthYear exposing (BirthYear, birthYearToString, makeBirthYear)
 import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
 import Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, makeValidFieldValue)
-import Domain.Utils.FirstName exposing (FirstName, firstNameToString, makeFirstName)
-import Domain.Utils.LastName exposing (LastName, lastNameToString, makeLastName)
+import Domain.Utils.FullName exposing (FullName, fullNameToString, makeFullName)
 import Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
 
 
@@ -14,8 +13,7 @@ type RegistrationForm
 
 
 type alias FieldValueSet =
-    { firstName : FieldValue FirstName
-    , lastName : FieldValue LastName
+    { fullName : FieldValue FullName
     , birthYear : FieldValue BirthYear
     , phoneNumber : FieldValue PhoneNumber
     , email : FieldValue Email
@@ -23,8 +21,7 @@ type alias FieldValueSet =
 
 
 type alias ValueSet =
-    { firstName : FirstName
-    , lastName : LastName
+    { fullName : FullName
     , birthYear : BirthYear
     , phoneNumber : PhoneNumber
     , email : Email
@@ -34,8 +31,7 @@ type alias ValueSet =
 emptyForm : RegistrationForm
 emptyForm =
     IncompleteRegistrationForm
-        { firstName = EmptyFieldValue
-        , lastName = EmptyFieldValue
+        { fullName = EmptyFieldValue
         , birthYear = EmptyFieldValue
         , phoneNumber = EmptyFieldValue
         , email = EmptyFieldValue
@@ -44,12 +40,7 @@ emptyForm =
 
 updateFirstName : RegistrationForm -> String -> RegistrationForm
 updateFirstName form string =
-    updateForm form (\fieldValues -> { fieldValues | firstName = fieldFieldValueFromString makeFirstName string })
-
-
-updateLastName : RegistrationForm -> String -> RegistrationForm
-updateLastName form string =
-    updateForm form (\fieldValues -> { fieldValues | lastName = fieldFieldValueFromString makeLastName string })
+    updateForm form (\fieldValues -> { fieldValues | fullName = fieldFieldValueFromString makeFullName string })
 
 
 updateBirthYear : RegistrationForm -> String -> Int -> RegistrationForm
@@ -75,14 +66,13 @@ getFieldValue form accessFunction =
 updateForm : RegistrationForm -> (FieldValueSet -> FieldValueSet) -> RegistrationForm
 updateForm form updateFunction =
     let
-        ({ firstName, lastName, birthYear, phoneNumber, email } as fieldValues) =
+        ({ fullName, birthYear, phoneNumber, email } as fieldValues) =
             incompleteFormFields form |> updateFunction
     in
-    case ( firstName, lastName, ( birthYear, phoneNumber, email ) ) of
-        ( ValidFieldValue _ validFirstName, ValidFieldValue _ validLastName, ( ValidFieldValue _ validBirthYear, ValidFieldValue _ validPhoneNumber, ValidFieldValue _ validEmail ) ) ->
+    case ( fullName, birthYear, ( phoneNumber, email ) ) of
+        ( ValidFieldValue _ validFirstName, ValidFieldValue _ validBirthYear, ( ValidFieldValue _ validPhoneNumber, ValidFieldValue _ validEmail ) ) ->
             CompleteRegistrationForm
-                { firstName = validFirstName
-                , lastName = validLastName
+                { fullName = validFirstName
                 , birthYear = validBirthYear
                 , phoneNumber = validPhoneNumber
                 , email = validEmail
@@ -98,9 +88,8 @@ incompleteFormFields form =
         IncompleteRegistrationForm fields ->
             fields
 
-        CompleteRegistrationForm { firstName, lastName, birthYear, phoneNumber, email } ->
-            { firstName = makeValidFieldValue firstName firstNameToString
-            , lastName = makeValidFieldValue lastName lastNameToString
+        CompleteRegistrationForm { fullName, birthYear, phoneNumber, email } ->
+            { fullName = makeValidFieldValue fullName fullNameToString
             , birthYear = makeValidFieldValue birthYear birthYearToString
             , phoneNumber = makeValidFieldValue phoneNumber phoneNumberToString
             , email = makeValidFieldValue email emailToString

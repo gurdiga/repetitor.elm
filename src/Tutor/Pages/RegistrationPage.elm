@@ -7,7 +7,7 @@ import Html.Attributes exposing (for, id, placeholder, required, style, type_, v
 import Html.Events exposing (onInput)
 import Task
 import Time
-import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updateLastName, updatePhoneNumber)
+import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updatePhoneNumber)
 import UI.Utils.FieldType exposing (InputType(..), inputTypeToString)
 
 
@@ -58,7 +58,6 @@ init _ =
 
 type Msg
     = UpdateFirstName String
-    | UpdateLastName String
     | UpdateBirthYear String
     | UpdatePhoneNumber String
     | UpdateEmail String
@@ -71,9 +70,6 @@ update msg ({ form, clock } as model) =
     case msg of
         UpdateFirstName string ->
             ( { model | form = updateFirstName form string }, Cmd.none )
-
-        UpdateLastName string ->
-            ( { model | form = updateLastName form string }, Cmd.none )
 
         UpdateBirthYear string ->
             ( { model | form = updateBirthYear form string (getYearFromClock clock) }, Cmd.none )
@@ -143,25 +139,17 @@ registrationForm form =
     in
     Html.form styles
         [ textField
-            { domId = "first-name"
+            { domId = "full-name"
             , label = "Prenume"
-            , note = "De exemplu Petru sau Maria."
-            , fieldValue = getFieldValue form .firstName
+            , note = ""
+            , fieldValue = getFieldValue form .fullName
             , toMsg = UpdateFirstName
-            , inputType = Text
-            }
-        , textField
-            { domId = "last-name"
-            , label = "Nume de familie"
-            , note = "De exemplu Teodorescu."
-            , fieldValue = getFieldValue form .lastName
-            , toMsg = UpdateLastName
             , inputType = Text
             }
         , textField
             { domId = "birth-year"
             , label = "Anul nașterii"
-            , note = "de exemplu 1979"
+            , note = ""
             , fieldValue = getFieldValue form .birthYear
             , toMsg = UpdateBirthYear
             , inputType = Number
@@ -169,7 +157,7 @@ registrationForm form =
         , textField
             { domId = "phone-number"
             , label = "Număr de telefon"
-            , note = "de exemplu 123456789"
+            , note = ""
             , fieldValue = getFieldValue form .phoneNumber
             , toMsg = UpdatePhoneNumber
             , inputType = PhoneNumber
@@ -177,7 +165,7 @@ registrationForm form =
         , textField
             { domId = "email"
             , label = "Email"
-            , note = "de exemplu george@gmail.com"
+            , note = ""
             , fieldValue = getFieldValue form .email
             , toMsg = UpdateEmail
             , inputType = Email
