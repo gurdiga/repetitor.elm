@@ -1,4 +1,4 @@
-module UI.Utils.FieldType exposing (InputType(..), inputTypeToString)
+module UI.Utils.InputType exposing (InputType(..), inputTypeToString)
 
 
 type InputType

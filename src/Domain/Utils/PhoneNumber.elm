@@ -31,11 +31,11 @@ makePhoneNumberFromDigits digits =
         prefix =
             String.slice 0 3 digits
     in
-    if String.length digits /= 9 then
-        makeErr "Numărul de telefon trebuie să aibă 9 cifre"
-
-    else if not (List.member prefix validPrefixes) then
+    if String.length digits > 2 && not (List.member prefix validPrefixes) then
         makeErr "Numărul de telefon trebuie să înceapă cu 060-069 sau 076-079"
+
+    else if String.length digits /= 9 then
+        makeErr "Numărul de telefon trebuie să aibă 9 cifre"
 
     else
         Ok (PhoneNumber digits)

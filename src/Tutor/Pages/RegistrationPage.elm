@@ -3,12 +3,10 @@ module Tutor.Pages.RegistrationPage exposing (main)
 import Browser
 import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
-import Html.Attributes exposing (for, id, placeholder, required, style, type_, value)
-import Html.Events exposing (onInput)
-import Task
-import Time
-import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateBirthYear, updateEmail, updateFirstName, updateForm, updatePhoneNumber)
-import UI.Utils.FieldType exposing (InputType(..), inputTypeToString)
+import Html.Attributes exposing (for, id, required, style, type_, value)
+import Html.Events exposing (onBlur, onFocus, onInput)
+import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateEmail, updateFullName, updatePhoneNumber)
+import UI.Utils.InputType exposing (InputType(..), inputTypeToString)
 
 
 
@@ -30,25 +28,20 @@ main =
 
 type alias Model =
     { form : RegistrationForm
-    , clock :
-        { zone : Time.Zone
-        , time : Time.Posix
-        }
+    , shouldDisplayFullNameErrorMessage : Bool
+    , shouldDisplayPhoneNumberErrorMessage : Bool
+    , shouldDisplayEmailErrorMessage : Bool
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { form = emptyForm
-      , clock =
-            { zone = Time.utc
-            , time = Time.millisToPosix 0
-            }
+      , shouldDisplayFullNameErrorMessage = False
+      , shouldDisplayPhoneNumberErrorMessage = False
+      , shouldDisplayEmailErrorMessage = False
       }
-    , Cmd.batch
-        [ Task.perform AdjustTimeZone Time.here
-        , Task.perform AdjustTime Time.now
-        ]
+    , Cmd.none
     )
 
 
@@ -57,43 +50,34 @@ init _ =
 
 
 type Msg
-    = UpdateFirstName String
-    | UpdateBirthYear String
+    = UpdateFullName String
+    | ToggleFullNameErrorMessage Bool
     | UpdatePhoneNumber String
+    | DisplayPhoneNumberErrorMessage Bool
     | UpdateEmail String
-    | AdjustTime Time.Posix
-    | AdjustTimeZone Time.Zone
+    | DisplayEmailErrorMessage Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ form, clock } as model) =
+update msg ({ form } as model) =
     case msg of
-        UpdateFirstName string ->
-            ( { model | form = updateFirstName form string }, Cmd.none )
+        UpdateFullName string ->
+            ( { model | form = updateFullName form string }, Cmd.none )
 
-        UpdateBirthYear string ->
-            ( { model | form = updateBirthYear form string (getYearFromClock clock) }, Cmd.none )
+        ToggleFullNameErrorMessage bool ->
+            ( { model | shouldDisplayFullNameErrorMessage = bool }, Cmd.none )
 
         UpdatePhoneNumber string ->
             ( { model | form = updatePhoneNumber form string }, Cmd.none )
 
+        DisplayPhoneNumberErrorMessage bool ->
+            ( { model | shouldDisplayPhoneNumberErrorMessage = bool }, Cmd.none )
+
         UpdateEmail string ->
             ( { model | form = updateEmail form string }, Cmd.none )
 
-        AdjustTime newTime ->
-            ( { model | clock = { clock | time = newTime } }
-            , Cmd.none
-            )
-
-        AdjustTimeZone newZone ->
-            ( { model | clock = { clock | zone = newZone } }
-            , Cmd.none
-            )
-
-
-getYearFromClock : { zone : Time.Zone, time : Time.Posix } -> Int
-getYearFromClock { zone, time } =
-    Time.toYear zone time
+        DisplayEmailErrorMessage bool ->
+            ( { model | shouldDisplayEmailErrorMessage = bool }, Cmd.none )
 
 
 
@@ -111,7 +95,7 @@ pageContents : Model -> Html Msg
 pageContents model =
     layoutPageContainer []
         [ h1 [] [ text "Înregistrare repetitor" ]
-        , registrationForm model.form
+        , registrationForm model
         , pre [ style "white-space" "normal" ] [ text (Debug.toString model) ]
         ]
 
@@ -131,43 +115,41 @@ layoutPageContainer additionalAttrs children =
     div attrs children
 
 
-registrationForm : RegistrationForm -> Html Msg
-registrationForm form =
+registrationForm : Model -> Html Msg
+registrationForm model =
     let
         styles =
             [ style "max-width" "400px" ]
     in
     Html.form styles
-        [ textField
+        [ field
             { domId = "full-name"
-            , label = "Prenume"
+            , label = "Nume"
             , note = ""
-            , fieldValue = getFieldValue form .fullName
-            , toMsg = UpdateFirstName
+            , fieldValue = getFieldValue model.form .fullName
+            , toMsg = UpdateFullName
+            , toggleErrorMessage = ToggleFullNameErrorMessage
+            , shouldDisplayErrorMessage = model.shouldDisplayFullNameErrorMessage
             , inputType = Text
             }
-        , textField
-            { domId = "birth-year"
-            , label = "Anul nașterii"
-            , note = ""
-            , fieldValue = getFieldValue form .birthYear
-            , toMsg = UpdateBirthYear
-            , inputType = Number
-            }
-        , textField
+        , field
             { domId = "phone-number"
-            , label = "Număr de telefon"
-            , note = ""
-            , fieldValue = getFieldValue form .phoneNumber
+            , label = "Telefon"
+            , note = "Veți primi parola pe SMS."
+            , fieldValue = getFieldValue model.form .phoneNumber
             , toMsg = UpdatePhoneNumber
+            , toggleErrorMessage = DisplayPhoneNumberErrorMessage
+            , shouldDisplayErrorMessage = model.shouldDisplayPhoneNumberErrorMessage
             , inputType = PhoneNumber
             }
-        , textField
+        , field
             { domId = "email"
             , label = "Email"
             , note = ""
-            , fieldValue = getFieldValue form .email
+            , fieldValue = getFieldValue model.form .email
             , toMsg = UpdateEmail
+            , toggleErrorMessage = DisplayEmailErrorMessage
+            , shouldDisplayErrorMessage = model.shouldDisplayEmailErrorMessage
             , inputType = Email
             }
         , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
@@ -175,10 +157,10 @@ registrationForm form =
         ]
 
 
-textField : { domId : String, label : String, note : String, fieldValue : FieldValue a, toMsg : String -> Msg, inputType : InputType } -> Html Msg
-textField { domId, label, note, fieldValue, toMsg, inputType } =
+field : { domId : String, label : String, note : String, fieldValue : FieldValue a, inputType : InputType, toMsg : String -> Msg, toggleErrorMessage : Bool -> Msg, shouldDisplayErrorMessage : Bool } -> Html Msg
+field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, shouldDisplayErrorMessage } =
     let
-        ( inputValue, fieldInfo, fieldInfoColor ) =
+        ( inputValue, statusMessage, statusMessageColor ) =
             case fieldValue of
                 EmptyFieldValue ->
                     ( "", "", "black" )
@@ -198,6 +180,13 @@ textField { domId, label, note, fieldValue, toMsg, inputType } =
 
         inputStyles =
             [ style "font" "inherit"
+            , style "background-color"
+                (if shouldDisplayErrorMessage then
+                    "yellow"
+
+                 else
+                    "transparent"
+                )
             ]
 
         noteStyles =
@@ -207,17 +196,37 @@ textField { domId, label, note, fieldValue, toMsg, inputType } =
             , style "margin" "0.2em 0 0"
             ]
 
-        errorMessageStyles =
+        statusMessageStyles =
             [ style "grid-column-start" "field"
-            , style "color" fieldInfoColor
+            , style "color" statusMessageColor
             ]
     in
     layoutRow
         [ Html.label (labelStyles ++ [ for domId ]) [ text label ]
-        , input (inputStyles ++ [ id domId, value inputValue, onInput toMsg, required True, type_ (inputTypeToString inputType) ]) []
-        , p noteStyles [ text note ]
-        , span errorMessageStyles [ text fieldInfo ]
+        , input
+            (inputStyles
+                ++ [ id domId
+                   , value inputValue
+                   , onInput toMsg
+                   , onFocus (toggleErrorMessage True)
+                   , onBlur (toggleErrorMessage False)
+                   , required True
+                   , type_ (inputTypeToString inputType)
+                   ]
+            )
+            []
+        , p noteStyles [ text note ] |> ifNotEmpty note
+        , p statusMessageStyles [ text statusMessage ] |> ifNotEmpty statusMessage
         ]
+
+
+ifNotEmpty : String -> Html Msg -> Html Msg
+ifNotEmpty string content =
+    if string == "" then
+        text ""
+
+    else
+        content
 
 
 submitButton : { label : String } -> Html Msg
