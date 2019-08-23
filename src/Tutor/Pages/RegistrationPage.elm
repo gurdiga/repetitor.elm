@@ -189,6 +189,17 @@ field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, sh
                 )
             ]
 
+        inputAttrs =
+            [ id domId
+            , value inputValue
+            , onInput toMsg
+            , onFocus (toggleErrorMessage True)
+            , onBlur (toggleErrorMessage False)
+            , required True
+            , type_ (inputTypeToString inputType)
+            ]
+                ++ inputStyles
+
         noteStyles =
             [ style "font-size" "0.75em"
             , style "opacity" "0.5"
@@ -203,18 +214,7 @@ field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, sh
     in
     layoutRow
         [ Html.label (labelStyles ++ [ for domId ]) [ text label ]
-        , input
-            (inputStyles
-                ++ [ id domId
-                   , value inputValue
-                   , onInput toMsg
-                   , onFocus (toggleErrorMessage True)
-                   , onBlur (toggleErrorMessage False)
-                   , required True
-                   , type_ (inputTypeToString inputType)
-                   ]
-            )
-            []
+        , input inputAttrs []
         , p noteStyles [ text note ] |> ifNotEmpty note
         , p validationMessageStyles [ text validationMessage ] |> ifNotEmpty validationMessage
         ]
