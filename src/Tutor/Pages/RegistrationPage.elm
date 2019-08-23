@@ -122,32 +122,32 @@ registrationForm model =
             [ style "max-width" "400px" ]
     in
     Html.form styles
-        [ field
+        [ formField
             { domId = "full-name"
             , label = "Nume"
             , note = ""
             , fieldValue = getFieldValue model.form .fullName
-            , toMsg = UpdateName
+            , toUpdateMsg = UpdateName
             , toggleErrorMessage = ToggleFullNameErrorMessage
             , shouldDisplayErrorMessage = model.shouldDisplayFullNameErrorMessage
             , inputType = Text
             }
-        , field
+        , formField
             { domId = "phone-number"
             , label = "Telefon"
             , note = "Veți primi parola pe SMS."
             , fieldValue = getFieldValue model.form .phoneNumber
-            , toMsg = UpdatePhoneNumber
+            , toUpdateMsg = UpdatePhoneNumber
             , toggleErrorMessage = DisplayPhoneNumberErrorMessage
             , shouldDisplayErrorMessage = model.shouldDisplayPhoneNumberErrorMessage
             , inputType = PhoneNumber
             }
-        , field
+        , formField
             { domId = "email"
             , label = "Email"
             , note = ""
             , fieldValue = getFieldValue model.form .email
-            , toMsg = UpdateEmail
+            , toUpdateMsg = UpdateEmail
             , toggleErrorMessage = DisplayEmailErrorMessage
             , shouldDisplayErrorMessage = model.shouldDisplayEmailErrorMessage
             , inputType = Email
@@ -157,8 +157,8 @@ registrationForm model =
         ]
 
 
-field : { domId : String, label : String, note : String, fieldValue : FieldValue a, inputType : InputType, toMsg : String -> Msg, toggleErrorMessage : Bool -> Msg, shouldDisplayErrorMessage : Bool } -> Html Msg
-field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, shouldDisplayErrorMessage } =
+formField : { domId : String, label : String, note : String, fieldValue : FieldValue a, inputType : InputType, toUpdateMsg : String -> Msg, toggleErrorMessage : Bool -> Msg, shouldDisplayErrorMessage : Bool } -> Html Msg
+formField { domId, label, note, fieldValue, inputType, toUpdateMsg, toggleErrorMessage, shouldDisplayErrorMessage } =
     let
         ( inputValue, validationMessage, validationMessageColor ) =
             case fieldValue of
@@ -192,7 +192,7 @@ field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, sh
         inputAttrs =
             [ id domId
             , value inputValue
-            , onInput toMsg
+            , onInput toUpdateMsg
             , onFocus (toggleErrorMessage True)
             , onBlur (toggleErrorMessage False)
             , required True
