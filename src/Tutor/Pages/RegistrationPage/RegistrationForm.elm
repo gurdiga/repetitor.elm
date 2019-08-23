@@ -1,4 +1,4 @@
-module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldValueSet, RegistrationForm, ValueSet, emptyForm, getFieldValue, updateEmail, updateForm, updateFullName, updatePhoneNumber)
+module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldValueSet, RegistrationForm, ValueSet, emptyForm, getFieldValue, updateEmail, updateForm, updateName, updatePhoneNumber)
 
 import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
 import Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, makeValidFieldValue)
@@ -34,8 +34,8 @@ emptyForm =
         }
 
 
-updateFullName : RegistrationForm -> String -> RegistrationForm
-updateFullName form string =
+updateName : RegistrationForm -> String -> RegistrationForm
+updateName form string =
     updateForm form (\fieldValues -> { fieldValues | fullName = fieldFieldValueFromString makeFullName string })
 
 

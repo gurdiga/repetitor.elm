@@ -5,7 +5,7 @@ import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
 import Html.Attributes exposing (for, id, required, style, type_, value)
 import Html.Events exposing (onBlur, onFocus, onInput)
-import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateEmail, updateFullName, updatePhoneNumber)
+import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateEmail, updateName, updatePhoneNumber)
 import UI.Utils.InputType exposing (InputType(..), inputTypeToString)
 
 
@@ -50,7 +50,7 @@ init _ =
 
 
 type Msg
-    = UpdateFullName String
+    = UpdateName String
     | ToggleFullNameErrorMessage Bool
     | UpdatePhoneNumber String
     | DisplayPhoneNumberErrorMessage Bool
@@ -61,8 +61,8 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ form } as model) =
     case msg of
-        UpdateFullName string ->
-            ( { model | form = updateFullName form string }, Cmd.none )
+        UpdateName string ->
+            ( { model | form = updateName form string }, Cmd.none )
 
         ToggleFullNameErrorMessage bool ->
             ( { model | shouldDisplayFullNameErrorMessage = bool }, Cmd.none )
@@ -127,7 +127,7 @@ registrationForm model =
             , label = "Nume"
             , note = ""
             , fieldValue = getFieldValue model.form .fullName
-            , toMsg = UpdateFullName
+            , toMsg = UpdateName
             , toggleErrorMessage = ToggleFullNameErrorMessage
             , shouldDisplayErrorMessage = model.shouldDisplayFullNameErrorMessage
             , inputType = Text
@@ -160,7 +160,7 @@ registrationForm model =
 field : { domId : String, label : String, note : String, fieldValue : FieldValue a, inputType : InputType, toMsg : String -> Msg, toggleErrorMessage : Bool -> Msg, shouldDisplayErrorMessage : Bool } -> Html Msg
 field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, shouldDisplayErrorMessage } =
     let
-        ( inputValue, statusMessage, statusMessageColor ) =
+        ( inputValue, validationMessage, validationMessageColor ) =
             case fieldValue of
                 EmptyFieldValue ->
                     ( "", "", "black" )
@@ -196,9 +196,9 @@ field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, sh
             , style "margin" "0.2em 0 0"
             ]
 
-        statusMessageStyles =
+        validationMessageStyles =
             [ style "grid-column-start" "field"
-            , style "color" statusMessageColor
+            , style "color" validationMessageColor
             ]
     in
     layoutRow
@@ -216,7 +216,7 @@ field { domId, label, note, fieldValue, inputType, toMsg, toggleErrorMessage, sh
             )
             []
         , p noteStyles [ text note ] |> ifNotEmpty note
-        , p statusMessageStyles [ text statusMessage ] |> ifNotEmpty statusMessage
+        , p validationMessageStyles [ text validationMessage ] |> ifNotEmpty validationMessage
         ]
 
 
