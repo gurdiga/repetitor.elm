@@ -1,4 +1,4 @@
-module Tutor.Pages.RegistrationPage.RegistrationForm exposing (FieldSet, RegistrationForm, ValueSet, emptyForm, getFieldValue, updateEmail, updateForm, updateName, updatePhoneNumber)
+module Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, FieldSet, RegistrationForm, ValueSet, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateForm, updateFullName, updatePhoneNumber)
 
 import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
 import Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, makeValidFieldValue)
@@ -13,14 +13,14 @@ type RegistrationForm
 
 type alias Field a =
     { value : FieldValue a
-    , hasBeenBlurred : Bool
+    , displayValidationMessage : Bool
     }
 
 
 emptyField : Field a
 emptyField =
     { value = EmptyFieldValue
-    , hasBeenBlurred = False
+    , displayValidationMessage = False
     }
 
 
@@ -47,8 +47,8 @@ emptyForm =
         }
 
 
-updateName : RegistrationForm -> String -> RegistrationForm
-updateName form string =
+updateFullName : RegistrationForm -> String -> RegistrationForm
+updateFullName form string =
     updateForm form
         (\({ fullName } as fields) ->
             { fields | fullName = { fullName | value = fieldFieldValueFromString makeFullName string } }
@@ -71,9 +71,33 @@ updateEmail form string =
         )
 
 
-getFieldValue : RegistrationForm -> (FieldSet -> Field a) -> FieldValue a
-getFieldValue form accessFunction =
-    incompleteFormFields form |> accessFunction |> .value
+displayValidationMessageForFullName : RegistrationForm -> Bool -> RegistrationForm
+displayValidationMessageForFullName form bool =
+    updateForm form
+        (\({ fullName } as fields) ->
+            { fields | fullName = { fullName | displayValidationMessage = bool } }
+        )
+
+
+displayValidationMessageForPhoneNumber : RegistrationForm -> Bool -> RegistrationForm
+displayValidationMessageForPhoneNumber form bool =
+    updateForm form
+        (\({ phoneNumber } as fields) ->
+            { fields | phoneNumber = { phoneNumber | displayValidationMessage = bool } }
+        )
+
+
+displayValidationMessageForEmail : RegistrationForm -> Bool -> RegistrationForm
+displayValidationMessageForEmail form bool =
+    updateForm form
+        (\({ email } as fields) ->
+            { fields | email = { email | displayValidationMessage = bool } }
+        )
+
+
+getField : RegistrationForm -> (FieldSet -> Field a) -> Field a
+getField form accessFunction =
+    incompleteFormFields form |> accessFunction
 
 
 updateForm : RegistrationForm -> (FieldSet -> FieldSet) -> RegistrationForm
@@ -101,7 +125,7 @@ incompleteFormFields form =
             fields
 
         CompleteRegistrationForm { fullName, phoneNumber, email } ->
-            { fullName = { value = makeValidFieldValue fullName fullNameToString, hasBeenBlurred = True }
-            , phoneNumber = { value = makeValidFieldValue phoneNumber phoneNumberToString, hasBeenBlurred = True }
-            , email = { value = makeValidFieldValue email emailToString, hasBeenBlurred = True }
+            { fullName = { value = makeValidFieldValue fullName fullNameToString, displayValidationMessage = True }
+            , phoneNumber = { value = makeValidFieldValue phoneNumber phoneNumberToString, displayValidationMessage = True }
+            , email = { value = makeValidFieldValue email emailToString, displayValidationMessage = True }
             }

@@ -18,13 +18,7 @@ fieldFieldValueFromString makeFunction string =
             ValidFieldValue string value
 
         Err errorMessage ->
-            InvalidFieldValue string
-                (if string == "" then
-                    "Lipsește valoarea."
-
-                 else
-                    errorMessage
-                )
+            InvalidFieldValue string errorMessage
 
 
 makeValidFieldValue : a -> (a -> String) -> FieldValue a

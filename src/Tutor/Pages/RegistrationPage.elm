@@ -5,7 +5,8 @@ import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
 import Html.Attributes exposing (for, id, required, style, type_, value)
 import Html.Events exposing (onBlur, onFocus, onInput)
-import Tutor.Pages.RegistrationPage.RegistrationForm exposing (RegistrationForm, emptyForm, getFieldValue, updateEmail, updateName, updatePhoneNumber)
+import Json.Decode exposing (Error(..))
+import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber)
 import UI.Utils.InputType exposing (InputType(..), inputTypeToString)
 
 
@@ -28,18 +29,12 @@ main =
 
 type alias Model =
     { form : RegistrationForm
-    , shouldDisplayFullNameErrorMessage : Bool
-    , shouldDisplayPhoneNumberErrorMessage : Bool
-    , shouldDisplayEmailErrorMessage : Bool
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { form = emptyForm
-      , shouldDisplayFullNameErrorMessage = False
-      , shouldDisplayPhoneNumberErrorMessage = False
-      , shouldDisplayEmailErrorMessage = False
       }
     , Cmd.none
     )
@@ -50,34 +45,34 @@ init _ =
 
 
 type Msg
-    = UpdateName String
-    | ToggleFullNameErrorMessage Bool
+    = UpdateFullName String
     | UpdatePhoneNumber String
-    | DisplayPhoneNumberErrorMessage Bool
     | UpdateEmail String
-    | DisplayEmailErrorMessage Bool
+    | DisplayValidationMessageForFullName Bool
+    | DisplayValidationMessageForPhoneNumber Bool
+    | DisplayValidationMessageForEmail Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ form } as model) =
     case msg of
-        UpdateName string ->
-            ( { model | form = updateName form string }, Cmd.none )
-
-        ToggleFullNameErrorMessage bool ->
-            ( { model | shouldDisplayFullNameErrorMessage = bool }, Cmd.none )
+        UpdateFullName string ->
+            ( { model | form = updateFullName form string }, Cmd.none )
 
         UpdatePhoneNumber string ->
             ( { model | form = updatePhoneNumber form string }, Cmd.none )
 
-        DisplayPhoneNumberErrorMessage bool ->
-            ( { model | shouldDisplayPhoneNumberErrorMessage = bool }, Cmd.none )
-
         UpdateEmail string ->
             ( { model | form = updateEmail form string }, Cmd.none )
 
-        DisplayEmailErrorMessage bool ->
-            ( { model | shouldDisplayEmailErrorMessage = bool }, Cmd.none )
+        DisplayValidationMessageForFullName bool ->
+            ( { model | form = displayValidationMessageForFullName form bool }, Cmd.none )
+
+        DisplayValidationMessageForPhoneNumber bool ->
+            ( { model | form = displayValidationMessageForPhoneNumber form bool }, Cmd.none )
+
+        DisplayValidationMessageForEmail bool ->
+            ( { model | form = displayValidationMessageForEmail form bool }, Cmd.none )
 
 
 
@@ -123,45 +118,42 @@ registrationForm model =
     in
     Html.form styles
         [ formField
-            { domId = "full-name"
+            { inputType = Text
             , label = "Nume"
+            , field = getField model.form .fullName
+            , domId = "full-name"
             , note = ""
-            , fieldValue = getFieldValue model.form .fullName
-            , toUpdateMsg = UpdateName
-            , toggleErrorMessage = ToggleFullNameErrorMessage
-            , shouldDisplayErrorMessage = model.shouldDisplayFullNameErrorMessage
-            , inputType = Text
+            , onInputMsg = UpdateFullName
+            , onBlurMsg = DisplayValidationMessageForFullName
             }
         , formField
-            { domId = "phone-number"
+            { inputType = PhoneNumber
             , label = "Telefon"
+            , field = getField model.form .phoneNumber
+            , domId = "phone-number"
             , note = "Veți primi parola pe SMS."
-            , fieldValue = getFieldValue model.form .phoneNumber
-            , toUpdateMsg = UpdatePhoneNumber
-            , toggleErrorMessage = DisplayPhoneNumberErrorMessage
-            , shouldDisplayErrorMessage = model.shouldDisplayPhoneNumberErrorMessage
-            , inputType = PhoneNumber
+            , onInputMsg = UpdatePhoneNumber
+            , onBlurMsg = DisplayValidationMessageForPhoneNumber
             }
         , formField
-            { domId = "email"
+            { inputType = Email
             , label = "Email"
+            , field = getField model.form .email
+            , domId = "email"
             , note = ""
-            , fieldValue = getFieldValue model.form .email
-            , toUpdateMsg = UpdateEmail
-            , toggleErrorMessage = DisplayEmailErrorMessage
-            , shouldDisplayErrorMessage = model.shouldDisplayEmailErrorMessage
-            , inputType = Email
+            , onInputMsg = UpdateEmail
+            , onBlurMsg = DisplayValidationMessageForEmail
             }
         , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
         , submitButton { label = "Înregistrează" }
         ]
 
 
-formField : { domId : String, label : String, note : String, fieldValue : FieldValue a, inputType : InputType, toUpdateMsg : String -> Msg, toggleErrorMessage : Bool -> Msg, shouldDisplayErrorMessage : Bool } -> Html Msg
-formField { domId, label, note, fieldValue, inputType, toUpdateMsg, toggleErrorMessage, shouldDisplayErrorMessage } =
+formField : { domId : String, label : String, note : String, field : Field a, inputType : InputType, onInputMsg : String -> Msg, onBlurMsg : Bool -> Msg } -> Html Msg
+formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
     let
         ( inputValue, validationMessage, validationMessageColor ) =
-            case fieldValue of
+            case field.value of
                 EmptyFieldValue ->
                     ( "", "", "black" )
 
@@ -180,21 +172,15 @@ formField { domId, label, note, fieldValue, inputType, toUpdateMsg, toggleErrorM
 
         inputStyles =
             [ style "font" "inherit"
-            , style "background-color"
-                (if shouldDisplayErrorMessage then
-                    "yellow"
-
-                 else
-                    "transparent"
-                )
             ]
 
         inputAttrs =
             [ id domId
             , value inputValue
-            , onInput toUpdateMsg
-            , onFocus (toggleErrorMessage True)
-            , onBlur (toggleErrorMessage False)
+            , onInput onInputMsg
+
+            -- , onFocus (toggleErrorMessage True)
+            , onBlur (onBlurMsg (inputValue /= ""))
             , required True
             , type_ (inputTypeToString inputType)
             ]
@@ -215,8 +201,10 @@ formField { domId, label, note, fieldValue, inputType, toUpdateMsg, toggleErrorM
     layoutRow
         [ Html.label (labelStyles ++ [ for domId ]) [ text label ]
         , input inputAttrs []
-        , p noteStyles [ text note ] |> ifNotEmpty note
-        , p validationMessageStyles [ text validationMessage ] |> ifNotEmpty validationMessage
+        , ifNotEmpty note (p noteStyles [ text note ])
+        , ifTrue
+            (field.displayValidationMessage && validationMessage /= "")
+            (p validationMessageStyles [ text validationMessage ])
         ]
 
 
@@ -227,6 +215,15 @@ ifNotEmpty string content =
 
     else
         content
+
+
+ifTrue : Bool -> Html Msg -> Html Msg
+ifTrue bool content =
+    if bool then
+        content
+
+    else
+        text ""
 
 
 submitButton : { label : String } -> Html Msg
