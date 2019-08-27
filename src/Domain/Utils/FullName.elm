@@ -9,16 +9,16 @@ makeFullName : String -> Result String FullName
 makeFullName string =
     string
         |> String.trim
-        |> validateName FullName
+        |> validateFullName FullName
 
 
-validateName : (String -> a) -> String -> Result String a
-validateName toValue string =
+validateFullName : (String -> a) -> String -> Result String a
+validateFullName toValue string =
     if String.length string < 3 then
         Err "Numele pare să fie incorect. (Prea scurt pentru un nume adevărat?)"
 
     else if String.length string > 50 then
-        Err " pare să fie incorect. (Mai mult de 50 de caractere?!)"
+        Err "Numele pare să fie incorect. (Mai mult de 50 de caractere?!)"
 
     else
         Ok (toValue string)

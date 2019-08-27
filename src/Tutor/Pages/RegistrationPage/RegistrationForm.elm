@@ -1,9 +1,10 @@
-module Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, FieldSet, RegistrationForm, ValueSet, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateForm, updateFullName, updatePhoneNumber, validateFields)
+module Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, FieldSet, RegistrationForm, ValueSet, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateForm, updateFullName, updatePhoneNumber, updateSignedUserAgreement, validateFields)
 
 import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
-import Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, isEmptyFieldValue, makeValidFieldValue)
+import Domain.Utils.FieldValue exposing (FieldValue(..), isEmptyFieldValue, makeFieldValueFromBool, makeFieldValueFromString, makeValidFieldValue)
 import Domain.Utils.FullName exposing (FullName, fullNameToString, makeFullName)
 import Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
+import Domain.Utils.SignedUserAgreement exposing (SignedUserAgreement, makeSignedUserAgreement, signedUserAgreementToString)
 
 
 type RegistrationForm
@@ -28,6 +29,7 @@ type alias FieldSet =
     { fullName : Field FullName
     , phoneNumber : Field PhoneNumber
     , email : Field Email
+    , signedUserAgreement : Field SignedUserAgreement
     }
 
 
@@ -35,6 +37,7 @@ type alias ValueSet =
     { fullName : FullName
     , phoneNumber : PhoneNumber
     , email : Email
+    , signedUserAgreement : SignedUserAgreement
     }
 
 
@@ -44,6 +47,7 @@ emptyForm =
         { fullName = emptyField
         , phoneNumber = emptyField
         , email = emptyField
+        , signedUserAgreement = emptyField
         }
 
 
@@ -51,7 +55,7 @@ updateFullName : String -> RegistrationForm -> RegistrationForm
 updateFullName string form =
     updateForm form
         (\({ fullName } as fields) ->
-            { fields | fullName = { fullName | value = fieldFieldValueFromString makeFullName string } }
+            { fields | fullName = { fullName | value = makeFieldValueFromString makeFullName string } }
         )
 
 
@@ -59,7 +63,7 @@ updatePhoneNumber : String -> RegistrationForm -> RegistrationForm
 updatePhoneNumber string form =
     updateForm form
         (\({ phoneNumber } as fields) ->
-            { fields | phoneNumber = { phoneNumber | value = fieldFieldValueFromString makePhoneNumber string } }
+            { fields | phoneNumber = { phoneNumber | value = makeFieldValueFromString makePhoneNumber string } }
         )
 
 
@@ -67,7 +71,15 @@ updateEmail : String -> RegistrationForm -> RegistrationForm
 updateEmail string form =
     updateForm form
         (\({ email } as fields) ->
-            { fields | email = { email | value = fieldFieldValueFromString makeEmail string } }
+            { fields | email = { email | value = makeFieldValueFromString makeEmail string } }
+        )
+
+
+updateSignedUserAgreement : Bool -> RegistrationForm -> RegistrationForm
+updateSignedUserAgreement bool form =
+    updateForm form
+        (\({ signedUserAgreement } as fields) ->
+            { fields | signedUserAgreement = { signedUserAgreement | value = makeFieldValueFromBool makeSignedUserAgreement bool } }
         )
 
 
@@ -95,10 +107,18 @@ displayValidationMessageForEmail bool form =
         )
 
 
+displayValidationMessageForSignedUserAgreement : Bool -> RegistrationForm -> RegistrationForm
+displayValidationMessageForSignedUserAgreement bool form =
+    updateForm form
+        (\({ signedUserAgreement } as fields) ->
+            { fields | signedUserAgreement = { signedUserAgreement | displayValidationMessage = bool } }
+        )
+
+
 validateFields : RegistrationForm -> RegistrationForm
 validateFields form =
     let
-        { fullName, email, phoneNumber } =
+        { fullName, email, phoneNumber, signedUserAgreement } =
             incompleteFormFields form
 
         f0 =
@@ -130,8 +150,17 @@ validateFields form =
 
             else
                 f2
+
+        f4 =
+            if isEmptyFieldValue signedUserAgreement.value then
+                f3
+                    |> updateSignedUserAgreement False
+                    |> displayValidationMessageForSignedUserAgreement True
+
+            else
+                f3
     in
-    f3
+    f4
 
 
 getField : RegistrationForm -> (FieldSet -> Field a) -> Field a
@@ -142,15 +171,16 @@ getField form accessFunction =
 updateForm : RegistrationForm -> (FieldSet -> FieldSet) -> RegistrationForm
 updateForm form updateFunction =
     let
-        ({ fullName, phoneNumber, email } as fields) =
+        ({ fullName, phoneNumber, email, signedUserAgreement } as fields) =
             incompleteFormFields form |> updateFunction
     in
-    case ( fullName.value, phoneNumber.value, email.value ) of
-        ( ValidFieldValue _ validFirstName, ValidFieldValue _ validPhoneNumber, ValidFieldValue _ validEmail ) ->
+    case ( fullName.value, phoneNumber.value, ( email.value, signedUserAgreement.value ) ) of
+        ( ValidFieldValue _ validFirstName, ValidFieldValue _ validPhoneNumber, ( ValidFieldValue _ validEmail, ValidFieldValue _ validSignedUserAgreement ) ) ->
             CompleteRegistrationForm
                 { fullName = validFirstName
                 , phoneNumber = validPhoneNumber
                 , email = validEmail
+                , signedUserAgreement = validSignedUserAgreement
                 }
 
         _ ->
@@ -163,8 +193,9 @@ incompleteFormFields form =
         IncompleteRegistrationForm fields ->
             fields
 
-        CompleteRegistrationForm { fullName, phoneNumber, email } ->
+        CompleteRegistrationForm { fullName, phoneNumber, email, signedUserAgreement } ->
             { fullName = { value = makeValidFieldValue fullName fullNameToString, displayValidationMessage = True }
             , phoneNumber = { value = makeValidFieldValue phoneNumber phoneNumberToString, displayValidationMessage = True }
             , email = { value = makeValidFieldValue email emailToString, displayValidationMessage = True }
+            , signedUserAgreement = { value = makeValidFieldValue signedUserAgreement signedUserAgreementToString, displayValidationMessage = True }
             }

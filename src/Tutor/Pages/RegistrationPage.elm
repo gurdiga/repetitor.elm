@@ -4,9 +4,9 @@ import Browser
 import Domain.Utils.FieldValue exposing (FieldValue(..), isEmptyFieldValue)
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
 import Html.Attributes exposing (for, id, novalidate, required, style, type_, value)
-import Html.Events exposing (onBlur, onClick, onFocus, onInput, preventDefaultOn)
+import Html.Events exposing (onBlur, onCheck, onClick, onInput, preventDefaultOn)
 import Json.Decode as Json exposing (Error(..))
-import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber, validateFields)
+import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber, updateSignedUserAgreement, validateFields)
 import UI.Utils.InputType exposing (InputType(..), inputTypeToString)
 
 
@@ -49,6 +49,7 @@ type Msg
     | UpdateFullName String
     | UpdatePhoneNumber String
     | UpdateEmail String
+    | UpdateSignedUserAgreement Bool
     | DisplayValidationMessageForFullName Bool
     | DisplayValidationMessageForPhoneNumber Bool
     | DisplayValidationMessageForEmail Bool
@@ -69,6 +70,9 @@ update msg ({ form } as model) =
 
         UpdateEmail string ->
             ( { model | form = form |> updateEmail string }, Cmd.none )
+
+        UpdateSignedUserAgreement bool ->
+            ( { model | form = form |> updateSignedUserAgreement bool }, Cmd.none )
 
         DisplayValidationMessageForFullName bool ->
             ( { model | form = form |> displayValidationMessageForFullName bool }, Cmd.none )
@@ -155,7 +159,13 @@ registrationForm model =
             , onInputMsg = UpdatePhoneNumber
             , onBlurMsg = DisplayValidationMessageForPhoneNumber
             }
-        , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
+        , checkBox
+            { label = "Accept Termenii de Utilizare"
+            , note = ""
+            , domId = "user-agreement"
+            , field = getField model.form .signedUserAgreement
+            , onCheckMsg = UpdateSignedUserAgreement
+            }
         , submitButton { label = "Înregistrează", onClickMsg = ValidateFields }
         ]
 
@@ -186,6 +196,9 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             , style "padding" "4px 0"
             ]
 
+        labelAttrs =
+            [ for domId ] ++ labelStyles
+
         inputStyles =
             [ style "font" "inherit"
             ]
@@ -213,7 +226,7 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             ]
     in
     layoutRow
-        [ Html.label (labelStyles ++ [ for domId ]) [ text label ]
+        [ Html.label labelAttrs [ text label ]
         , input inputAttrs []
         , ifNotEmpty note (p noteStyles [ text note ])
         , ifTrue
@@ -257,16 +270,60 @@ submitButton { label, onClickMsg } =
         ]
 
 
-checkBox : { label : String } -> Html Msg
-checkBox { label } =
+checkBox : { label : String, note : String, domId : String, field : Field a, onCheckMsg : Bool -> Msg } -> Html Msg
+checkBox { label, note, domId, field, onCheckMsg } =
     let
-        attrs =
-            [ type_ "checkbox" ]
+        ( inputValue, validationMessage, validationMessageColor ) =
+            case field.value of
+                EmptyFieldValue ->
+                    ( "", "", "black" )
+
+                InvalidFieldValue textValue errorMessage ->
+                    ( textValue, errorMessage, "red" )
+
+                ValidFieldValue textValue _ ->
+                    ( textValue, "Bun.", "green" )
+
+        inputStyles =
+            []
+
+        inputAttrs =
+            [ type_ "checkbox"
+            , value inputValue
+            , id domId
+            , onCheck onCheckMsg
+            ]
+                ++ inputStyles
+
+        labelStyles =
+            []
+
+        labelAttrs =
+            [ for domId ] ++ labelStyles
+
+        noteStyles =
+            [ style "font-size" "0.75em"
+            , style "opacity" "0.5"
+            , style "grid-column-start" "field"
+            , style "margin" "0.2em 0 0"
+            ]
+
+        validationMessageStyles =
+            [ style "color" validationMessageColor
+            ]
+
+        divStyles =
+            [ style "grid-column-start" "field"
+            ]
     in
     layoutRow
-        [ Html.label []
-            [ input attrs []
-            , span [] [ text label ]
+        [ div divStyles
+            [ input inputAttrs []
+            , Html.label labelAttrs [ text label ]
+            , ifNotEmpty note (p noteStyles [ text note ])
+            , ifTrue
+                (field.displayValidationMessage && validationMessage /= "")
+                (p validationMessageStyles [ text validationMessage ])
             ]
         ]
 
@@ -277,7 +334,7 @@ layoutRow children =
         styles =
             [ style "margin-top" "0.5em"
             , style "display" "grid"
-            , style "grid-template-columns" "[label] auto [field] 50%"
+            , style "grid-template-columns" "[label] auto [field] 70%"
             ]
 
         attrs =
