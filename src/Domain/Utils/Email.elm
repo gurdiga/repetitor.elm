@@ -43,7 +43,7 @@ emailRegex : Regex.Regex
 emailRegex =
     -- Thanks to https://emailregex.com/
     Maybe.withDefault Regex.never <|
-        Regex.fromString "[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*"
+        Regex.fromString "[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]{2,})+"
 
 
 emailToString : Email -> String
