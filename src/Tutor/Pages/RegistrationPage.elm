@@ -1,7 +1,7 @@
 module Tutor.Pages.RegistrationPage exposing (main)
 
 import Browser
-import Domain.Utils.FieldValue exposing (FieldValue(..))
+import Domain.Utils.FieldValue exposing (FieldValue(..), isEmptyFieldValue)
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
 import Html.Attributes exposing (for, id, novalidate, required, style, type_, value)
 import Html.Events exposing (onBlur, onFocus, onInput, preventDefaultOn)
@@ -175,14 +175,6 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
                 ValidFieldValue textValue _ ->
                     ( textValue, "Bun.", "green" )
 
-        shouldDisplayValidationMessages =
-            case field.value of
-                EmptyFieldValue ->
-                    False
-
-                _ ->
-                    True
-
         labelStyles =
             [ style "margin-right" "0.5em"
             , style "font" "inherit"
@@ -200,7 +192,7 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             , onInput onInputMsg
 
             -- , onFocus (toggleErrorMessage True)
-            , onBlur (onBlurMsg shouldDisplayValidationMessages)
+            , onBlur (onBlurMsg (isEmptyFieldValue field.value))
             , required True
             , type_ (inputTypeToString inputType)
             ]
