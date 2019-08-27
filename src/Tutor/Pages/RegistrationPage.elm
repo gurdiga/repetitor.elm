@@ -4,9 +4,9 @@ import Browser
 import Domain.Utils.FieldValue exposing (FieldValue(..), isEmptyFieldValue)
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
 import Html.Attributes exposing (for, id, novalidate, required, style, type_, value)
-import Html.Events exposing (onBlur, onFocus, onInput, preventDefaultOn)
+import Html.Events exposing (onBlur, onClick, onFocus, onInput, preventDefaultOn)
 import Json.Decode as Json exposing (Error(..))
-import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber)
+import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber, validateFields)
 import UI.Utils.InputType exposing (InputType(..), inputTypeToString)
 
 
@@ -52,6 +52,7 @@ type Msg
     | DisplayValidationMessageForFullName Bool
     | DisplayValidationMessageForPhoneNumber Bool
     | DisplayValidationMessageForEmail Bool
+    | ValidateFields
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,6 +78,9 @@ update msg ({ form } as model) =
 
         DisplayValidationMessageForEmail bool ->
             ( { model | form = displayValidationMessageForEmail form bool }, Cmd.none )
+
+        ValidateFields ->
+            ( { model | form = validateFields form }, Cmd.none )
 
 
 
@@ -129,9 +133,18 @@ registrationForm model =
             , label = "Nume"
             , field = getField model.form .fullName
             , domId = "full-name"
-            , note = ""
+            , note = "Numele dumneavoastră va fi afișat lîngă cursurile pe care le veți oferi."
             , onInputMsg = UpdateFullName
             , onBlurMsg = DisplayValidationMessageForFullName
+            }
+        , formField
+            { inputType = Email
+            , label = "Email"
+            , field = getField model.form .email
+            , domId = "email"
+            , note = "Va fi folosit pentru comunicarea operativă."
+            , onInputMsg = UpdateEmail
+            , onBlurMsg = DisplayValidationMessageForEmail
             }
         , formField
             { inputType = PhoneNumber
@@ -142,17 +155,8 @@ registrationForm model =
             , onInputMsg = UpdatePhoneNumber
             , onBlurMsg = DisplayValidationMessageForPhoneNumber
             }
-        , formField
-            { inputType = Email
-            , label = "Email"
-            , field = getField model.form .email
-            , domId = "email"
-            , note = ""
-            , onInputMsg = UpdateEmail
-            , onBlurMsg = DisplayValidationMessageForEmail
-            }
         , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
-        , submitButton { label = "Înregistrează" }
+        , submitButton { label = "Înregistrează", onClickMsg = ValidateFields }
         ]
 
 
@@ -236,14 +240,17 @@ ifTrue bool content =
         text ""
 
 
-submitButton : { label : String } -> Html Msg
-submitButton { label } =
+submitButton : { label : String, onClickMsg : Msg } -> Html Msg
+submitButton { label, onClickMsg } =
     let
         styles =
             [ style "font" "inherit" ]
 
         attrs =
-            styles ++ [ type_ "submit" ]
+            [ type_ "submit"
+            , onClick onClickMsg
+            ]
+                ++ styles
     in
     layoutRow
         [ button attrs [ text label ]

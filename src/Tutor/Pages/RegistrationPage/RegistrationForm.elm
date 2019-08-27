@@ -1,7 +1,7 @@
-module Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, FieldSet, RegistrationForm, ValueSet, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateForm, updateFullName, updatePhoneNumber)
+module Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, FieldSet, RegistrationForm, ValueSet, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateForm, updateFullName, updatePhoneNumber, validateFields)
 
 import Domain.Utils.Email exposing (Email, emailToString, makeEmail)
-import Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, makeValidFieldValue)
+import Domain.Utils.FieldValue exposing (FieldValue(..), fieldFieldValueFromString, isEmptyFieldValue, makeValidFieldValue)
 import Domain.Utils.FullName exposing (FullName, fullNameToString, makeFullName)
 import Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
 
@@ -93,6 +93,39 @@ displayValidationMessageForEmail form bool =
         (\({ email } as fields) ->
             { fields | email = { email | displayValidationMessage = bool } }
         )
+
+
+validateFields : RegistrationForm -> RegistrationForm
+validateFields form =
+    let
+        { fullName, email, phoneNumber } =
+            incompleteFormFields form
+
+        f0 =
+            form
+
+        f1 =
+            if isEmptyFieldValue fullName.value then
+                displayValidationMessageForFullName (updateFullName f0 "") True
+
+            else
+                f0
+
+        f2 =
+            if isEmptyFieldValue email.value then
+                displayValidationMessageForEmail (updateEmail f1 "") True
+
+            else
+                f1
+
+        f3 =
+            if isEmptyFieldValue phoneNumber.value then
+                displayValidationMessageForPhoneNumber (updatePhoneNumber f2 "") True
+
+            else
+                f2
+    in
+    f3
 
 
 getField : RegistrationForm -> (FieldSet -> Field a) -> Field a
