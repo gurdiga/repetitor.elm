@@ -3,7 +3,7 @@ module Tutor.Pages.RegistrationPage exposing (main)
 import Browser
 import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
-import Html.Attributes exposing (for, id, required, style, type_, value)
+import Html.Attributes exposing (for, id, novalidate, required, style, type_, value)
 import Html.Events exposing (onBlur, onFocus, onInput, preventDefaultOn)
 import Json.Decode as Json exposing (Error(..))
 import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber)
@@ -121,7 +121,7 @@ registrationForm model =
             [ style "max-width" "400px" ]
 
         attrs =
-            [ preventDefaultSubmit True Noop ] ++ styles
+            [ preventDefaultSubmit True Noop, novalidate True ] ++ styles
     in
     Html.form attrs
         [ formField
@@ -175,6 +175,14 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
                 ValidFieldValue textValue _ ->
                     ( textValue, "Bun.", "green" )
 
+        shouldDisplayValidationMessages =
+            case field.value of
+                EmptyFieldValue ->
+                    False
+
+                _ ->
+                    True
+
         labelStyles =
             [ style "margin-right" "0.5em"
             , style "font" "inherit"
@@ -192,7 +200,7 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             , onInput onInputMsg
 
             -- , onFocus (toggleErrorMessage True)
-            , onBlur (onBlurMsg (inputValue /= ""))
+            , onBlur (onBlurMsg shouldDisplayValidationMessages)
             , required True
             , type_ (inputTypeToString inputType)
             ]
