@@ -4,8 +4,8 @@ import Browser
 import Domain.Utils.FieldValue exposing (FieldValue(..))
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
 import Html.Attributes exposing (for, id, required, style, type_, value)
-import Html.Events exposing (onBlur, onFocus, onInput)
-import Json.Decode exposing (Error(..))
+import Html.Events exposing (onBlur, onFocus, onInput, preventDefaultOn)
+import Json.Decode as Json exposing (Error(..))
 import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber)
 import UI.Utils.InputType exposing (InputType(..), inputTypeToString)
 
@@ -45,7 +45,8 @@ init _ =
 
 
 type Msg
-    = UpdateFullName String
+    = Noop
+    | UpdateFullName String
     | UpdatePhoneNumber String
     | UpdateEmail String
     | DisplayValidationMessageForFullName Bool
@@ -56,6 +57,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ form } as model) =
     case msg of
+        Noop ->
+            ( model, Cmd.none )
+
         UpdateFullName string ->
             ( { model | form = updateFullName form string }, Cmd.none )
 
@@ -115,8 +119,11 @@ registrationForm model =
     let
         styles =
             [ style "max-width" "400px" ]
+
+        attrs =
+            [ preventDefaultSubmit True Noop ] ++ styles
     in
-    Html.form styles
+    Html.form attrs
         [ formField
             { inputType = Text
             , label = "Nume"
@@ -147,6 +154,11 @@ registrationForm model =
         , checkBox { label = "Sunt de acord cu condițiile de utilizare" }
         , submitButton { label = "Înregistrează" }
         ]
+
+
+preventDefaultSubmit : Bool -> Msg -> Attribute Msg
+preventDefaultSubmit bool msg =
+    preventDefaultOn "submit" (Json.map (\m -> ( m, bool )) (Json.succeed msg))
 
 
 formField : { domId : String, label : String, note : String, field : Field a, inputType : InputType, onInputMsg : String -> Msg, onBlurMsg : Bool -> Msg } -> Html Msg
