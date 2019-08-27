@@ -30,7 +30,7 @@ isEmptyFieldValue : FieldValue a -> Bool
 isEmptyFieldValue fieldValue =
     case fieldValue of
         EmptyFieldValue ->
-            False
+            True
 
         _ ->
-            True
+            False

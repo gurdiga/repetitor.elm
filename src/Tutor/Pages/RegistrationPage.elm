@@ -190,9 +190,7 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             [ id domId
             , value inputValue
             , onInput onInputMsg
-
-            -- , onFocus (toggleErrorMessage True)
-            , onBlur (onBlurMsg (isEmptyFieldValue field.value))
+            , onBlur (onBlurMsg (not (isEmptyFieldValue field.value)))
             , required True
             , type_ (inputTypeToString inputType)
             ]
