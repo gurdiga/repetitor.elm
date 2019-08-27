@@ -47,48 +47,48 @@ emptyForm =
         }
 
 
-updateFullName : RegistrationForm -> String -> RegistrationForm
-updateFullName form string =
+updateFullName : String -> RegistrationForm -> RegistrationForm
+updateFullName string form =
     updateForm form
         (\({ fullName } as fields) ->
             { fields | fullName = { fullName | value = fieldFieldValueFromString makeFullName string } }
         )
 
 
-updatePhoneNumber : RegistrationForm -> String -> RegistrationForm
-updatePhoneNumber form string =
+updatePhoneNumber : String -> RegistrationForm -> RegistrationForm
+updatePhoneNumber string form =
     updateForm form
         (\({ phoneNumber } as fields) ->
             { fields | phoneNumber = { phoneNumber | value = fieldFieldValueFromString makePhoneNumber string } }
         )
 
 
-updateEmail : RegistrationForm -> String -> RegistrationForm
-updateEmail form string =
+updateEmail : String -> RegistrationForm -> RegistrationForm
+updateEmail string form =
     updateForm form
         (\({ email } as fields) ->
             { fields | email = { email | value = fieldFieldValueFromString makeEmail string } }
         )
 
 
-displayValidationMessageForFullName : RegistrationForm -> Bool -> RegistrationForm
-displayValidationMessageForFullName form bool =
+displayValidationMessageForFullName : Bool -> RegistrationForm -> RegistrationForm
+displayValidationMessageForFullName bool form =
     updateForm form
         (\({ fullName } as fields) ->
             { fields | fullName = { fullName | displayValidationMessage = bool } }
         )
 
 
-displayValidationMessageForPhoneNumber : RegistrationForm -> Bool -> RegistrationForm
-displayValidationMessageForPhoneNumber form bool =
+displayValidationMessageForPhoneNumber : Bool -> RegistrationForm -> RegistrationForm
+displayValidationMessageForPhoneNumber bool form =
     updateForm form
         (\({ phoneNumber } as fields) ->
             { fields | phoneNumber = { phoneNumber | displayValidationMessage = bool } }
         )
 
 
-displayValidationMessageForEmail : RegistrationForm -> Bool -> RegistrationForm
-displayValidationMessageForEmail form bool =
+displayValidationMessageForEmail : Bool -> RegistrationForm -> RegistrationForm
+displayValidationMessageForEmail bool form =
     updateForm form
         (\({ email } as fields) ->
             { fields | email = { email | displayValidationMessage = bool } }
@@ -106,21 +106,27 @@ validateFields form =
 
         f1 =
             if isEmptyFieldValue fullName.value then
-                displayValidationMessageForFullName (updateFullName f0 "") True
+                f0
+                    |> updateFullName ""
+                    |> displayValidationMessageForFullName True
 
             else
                 f0
 
         f2 =
             if isEmptyFieldValue email.value then
-                displayValidationMessageForEmail (updateEmail f1 "") True
+                f1
+                    |> updateEmail ""
+                    |> displayValidationMessageForEmail True
 
             else
                 f1
 
         f3 =
             if isEmptyFieldValue phoneNumber.value then
-                displayValidationMessageForPhoneNumber (updatePhoneNumber f2 "") True
+                f2
+                    |> updatePhoneNumber ""
+                    |> displayValidationMessageForPhoneNumber True
 
             else
                 f2

@@ -62,22 +62,22 @@ update msg ({ form } as model) =
             ( model, Cmd.none )
 
         UpdateFullName string ->
-            ( { model | form = updateFullName form string }, Cmd.none )
+            ( { model | form = form |> updateFullName string }, Cmd.none )
 
         UpdatePhoneNumber string ->
-            ( { model | form = updatePhoneNumber form string }, Cmd.none )
+            ( { model | form = form |> updatePhoneNumber string }, Cmd.none )
 
         UpdateEmail string ->
-            ( { model | form = updateEmail form string }, Cmd.none )
+            ( { model | form = form |> updateEmail string }, Cmd.none )
 
         DisplayValidationMessageForFullName bool ->
-            ( { model | form = displayValidationMessageForFullName form bool }, Cmd.none )
+            ( { model | form = form |> displayValidationMessageForFullName bool }, Cmd.none )
 
         DisplayValidationMessageForPhoneNumber bool ->
-            ( { model | form = displayValidationMessageForPhoneNumber form bool }, Cmd.none )
+            ( { model | form = form |> displayValidationMessageForPhoneNumber bool }, Cmd.none )
 
         DisplayValidationMessageForEmail bool ->
-            ( { model | form = displayValidationMessageForEmail form bool }, Cmd.none )
+            ( { model | form = form |> displayValidationMessageForEmail bool }, Cmd.none )
 
         ValidateFields ->
             ( { model | form = validateFields form }, Cmd.none )
