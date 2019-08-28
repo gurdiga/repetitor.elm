@@ -1,9 +1,12 @@
 module Tutor.Pages.RegistrationPage exposing (main)
 
 import Browser
+import Domain.Utils.Email as Email
 import Domain.Utils.FieldValue exposing (FieldValue(..), isEmptyFieldValue)
+import Domain.Utils.FullName as FullName
+import Domain.Utils.PhoneNumber as PhoneNumber
 import Html exposing (Attribute, Html, button, div, h1, input, p, pre, span, text)
-import Html.Attributes exposing (for, id, novalidate, required, style, type_, value)
+import Html.Attributes exposing (attribute, autofocus, for, id, maxlength, minlength, novalidate, required, style, type_, value)
 import Html.Events exposing (onBlur, onCheck, onClick, onInput, preventDefaultOn)
 import Json.Decode as Json exposing (Error(..))
 import Tutor.Pages.RegistrationPage.RegistrationForm exposing (Field, RegistrationForm, displayValidationMessageForEmail, displayValidationMessageForFullName, displayValidationMessageForPhoneNumber, emptyForm, getField, updateEmail, updateFullName, updatePhoneNumber, updateSignedUserAgreement, validateFields)
@@ -140,6 +143,9 @@ registrationForm model =
             , note = "Numele dumneavoastră va fi afișat lîngă cursurile pe care le veți oferi."
             , onInputMsg = UpdateFullName
             , onBlurMsg = DisplayValidationMessageForFullName
+            , maxLength = Just FullName.maxLength
+            , minLength = Just FullName.minLength
+            , autoFocus = True
             }
         , formField
             { inputType = Email
@@ -149,6 +155,9 @@ registrationForm model =
             , note = "Va fi folosit pentru comunicarea operativă."
             , onInputMsg = UpdateEmail
             , onBlurMsg = DisplayValidationMessageForEmail
+            , maxLength = Just Email.maxLength
+            , minLength = Just Email.minLength
+            , autoFocus = False
             }
         , formField
             { inputType = PhoneNumber
@@ -158,6 +167,9 @@ registrationForm model =
             , note = "Veți primi parola pe SMS."
             , onInputMsg = UpdatePhoneNumber
             , onBlurMsg = DisplayValidationMessageForPhoneNumber
+            , maxLength = Just PhoneNumber.length
+            , minLength = Just PhoneNumber.length
+            , autoFocus = False
             }
         , checkBox
             { label = "Accept Termenii de Utilizare"
@@ -175,8 +187,8 @@ preventDefaultSubmit bool msg =
     preventDefaultOn "submit" (Json.map (\m -> ( m, bool )) (Json.succeed msg))
 
 
-formField : { domId : String, label : String, note : String, field : Field a, inputType : InputType, onInputMsg : String -> Msg, onBlurMsg : Bool -> Msg } -> Html Msg
-formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
+formField : { domId : String, label : String, note : String, field : Field a, inputType : InputType, onInputMsg : String -> Msg, onBlurMsg : Bool -> Msg, minLength : Maybe Int, maxLength : Maybe Int, autoFocus : Bool } -> Html Msg
+formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg, minLength, maxLength, autoFocus } =
     let
         ( inputValue, validationMessage, validationMessageColor ) =
             case field.value of
@@ -200,8 +212,7 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             [ for domId ] ++ labelStyles
 
         inputStyles =
-            [ style "font" "inherit"
-            ]
+            [ style "font" "inherit" ]
 
         inputAttrs =
             [ id domId
@@ -210,7 +221,11 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             , onBlur (onBlurMsg (not (isEmptyFieldValue field.value)))
             , required True
             , type_ (inputTypeToString inputType)
+            , autofocus autoFocus
+            , attribute "aria-described-by" noteDomId
             ]
+                ++ attrsFromMaybe maxlength maxLength
+                ++ attrsFromMaybe minlength minLength
                 ++ inputStyles
 
         noteStyles =
@@ -220,6 +235,12 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
             , style "margin" "0.2em 0 0"
             ]
 
+        noteDomId =
+            domId ++ "-note"
+
+        noteAttrs =
+            [ id noteDomId ] ++ noteStyles
+
         validationMessageStyles =
             [ style "grid-column-start" "field"
             , style "color" validationMessageColor
@@ -228,7 +249,7 @@ formField { domId, label, note, field, inputType, onInputMsg, onBlurMsg } =
     layoutRow
         [ Html.label labelAttrs [ text label ]
         , input inputAttrs []
-        , ifNotEmpty note (p noteStyles [ text note ])
+        , ifNotEmpty note (p noteAttrs [ text note ])
         , ifTrue
             (field.displayValidationMessage && validationMessage /= "")
             (p validationMessageStyles [ text validationMessage ])
@@ -251,6 +272,16 @@ ifTrue bool content =
 
     else
         text ""
+
+
+attrsFromMaybe : (a -> Attribute Msg) -> Maybe a -> List (Attribute Msg)
+attrsFromMaybe attr maybe =
+    case maybe of
+        Just v ->
+            [ attr v ]
+
+        Nothing ->
+            []
 
 
 submitButton : { label : String, onClickMsg : Msg } -> Html Msg

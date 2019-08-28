@@ -1,4 +1,4 @@
-module Domain.Utils.Email exposing (Email, emailToString, makeEmail)
+module Domain.Utils.Email exposing (Email, emailToString, makeEmail, maxLength, minLength)
 
 import Regex
 
@@ -49,3 +49,13 @@ emailRegex =
 emailToString : Email -> String
 emailToString (Email string) =
     string
+
+
+minLength : Int
+minLength =
+    6
+
+
+maxLength : Int
+maxLength =
+    50

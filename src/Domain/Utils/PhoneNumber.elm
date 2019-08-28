@@ -1,4 +1,4 @@
-module Domain.Utils.PhoneNumber exposing (PhoneNumber, makePhoneNumber, phoneNumberToString)
+module Domain.Utils.PhoneNumber exposing (PhoneNumber, length, makePhoneNumber, phoneNumberToString)
 
 import Parser exposing ((|.), (|=), Parser, chompWhile, end, getChompedString, succeed)
 
@@ -34,7 +34,7 @@ makePhoneNumberFromDigits digits =
     if String.length digits > 2 && not (List.member prefix validPrefixes) then
         makeErr "Numărul de telefon trebuie să înceapă cu 060-069 sau 076-079"
 
-    else if String.length digits /= 9 then
+    else if String.length digits /= length then
         makeErr "Numărul de telefon trebuie să aibă 9 cifre"
 
     else
@@ -63,3 +63,8 @@ digitStringParser =
 phoneNumberToString : PhoneNumber -> String
 phoneNumberToString (PhoneNumber string) =
     string
+
+
+length : Int
+length =
+    9
